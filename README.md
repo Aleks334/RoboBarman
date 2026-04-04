@@ -1,8 +1,37 @@
-# RoboBarman project documentation
-This project is for the computer systems architecture course. Its objective is to create a computer system designed to detect cups placed in specific locations and fill them with liquid. The compiled code will run on an ATmega328P-PU microcontroller.
+# RoboBarman
+This project is for the computer systems architecture course. Its objective is to create a computer system designed to detect cups placed in specific locations and fill them with liquid. The compiled code will run on an ATmega328P microcontroller. The prototype board for development is Arduino Uno.
 
-## Initialization
--	The arm returns to station 0
+
+## Getting started
+
+0. Prerequisites:
+- VS Code with installed extension [PlatformIO IDE](https://docs.platformio.org/en/latest/integration/ide/pioide.html).
+- Arduino Uno board (ATmega328P).
+
+1. Clone repo and open with VS Code. PlatformIO automatically downloads all dependencies.
+```bash
+git clone https://github.com/Aleks334/RoboBarman.git
+```
+
+2. Compile project:
+```bash
+pio run -e uno
+```
+
+3. Upload project to the board:
+```bash
+pio run -t upload
+```
+
+More about [PlatformIO CLI](https://docs.platformio.org/en/latest/core/index.html)
+
+> [!NOTE]
+> Please make sure that your board is detected by PlatformIO by running: `pio device list`.
+
+## Project documentation
+
+### Setup
+-	The arm returns to position 0
 -	The pump is off
 -	The order queue is empty
 -	currently_served = NULL
@@ -10,7 +39,7 @@ This project is for the computer systems architecture course. Its objective is t
 -	LEDs are SOLID_GREEN
 
 
-## States 
+### States 
 
 Station states:
 - IDLE – Station is empty.
@@ -43,7 +72,7 @@ stateDiagram-v2
     FILLING --> WAITING_FOR_TASK
 ```
 
-## Happy path
+### Happy path
 1. User A places a cup on one of the available stations.
 2. The sensor detects the cup; station state changes to OCCUPIED, LED turns SOLID_RED.
 3. The system pulls the task from the queue. Station state changes to IN_PROGRESS, LED FLASHING_RED.
@@ -54,7 +83,7 @@ stateDiagram-v2
 8. User A removes the cup, releasing station. Station state returns to IDLE, LED turns SOLID_GREEN.
 
 
-## Main loop pseudocode
+### Main loop pseudocode
 ```
 // Sensor handling.
 For each station (i) in the stations array:
@@ -93,7 +122,7 @@ If BARTENDER_STATE == FILLING:
         currently_served = NULL
 ```
 
-## Edge cases to manage
+### Edge cases to manage
 - Cup removed during the filling process.
 - Liquid tank is empty
 - Microcontroller reset during the filling process.
