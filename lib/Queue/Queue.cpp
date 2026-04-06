@@ -43,3 +43,18 @@ bool Queue::isFull() const {
 bool Queue::isEmpty() const { 
     return currentSize == 0;
 }
+
+uint8_t Queue::size() const {
+    return currentSize;
+}
+
+bool Queue::contains(uint8_t item) const {
+    for (uint8_t i = 0; i < currentSize; i++) {
+        uint8_t currentIndex = (frontIndex + i) % CAPACITY;
+        
+        if (arr[currentIndex] == item) {
+            return true;
+        }
+    }
+    return false;
+}

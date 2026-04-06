@@ -2,81 +2,63 @@
 #include "Queue.h"
 
 const uint8_t QUEUE_CAPACITY = 5;
+Queue queue;
 
 namespace TestUtils {
-    void fillQueue(Queue& queue, uint8_t startVal, uint8_t count) {
-        for (uint8_t i = 0; i < count; i++) {
-            queue.insert(startVal + i);
-        }
+    void fill(Queue& q, uint8_t count, uint8_t start = 1) {
+        for (uint8_t i = 0; i < count; i++) q.insert(start + i);
     }
 
-    uint8_t popValue(Queue& queue) {
+    uint8_t popValue(Queue& q) {
         uint8_t val = 0;
-        queue.pop(val);
+        q.pop(val);
         return val;
     }
 }
 
-Queue queue;
-
-void setUp() {
+void setUp() { 
     queue = Queue();
 }
 
 void tearDown() {}
 
-void test_should_be_empty_on_initialization() {
-    bool empty = queue.isEmpty();
+void test_should_be_empty_on_init() {
+    uint8_t val;
+
+    TEST_ASSERT_TRUE(queue.isEmpty());
+    TEST_ASSERT_EQUAL(0, queue.size());
     
-    TEST_ASSERT_TRUE(empty);
+    TEST_ASSERT_EQUAL(QueueStatus::EMPTY, queue.pop(val));
+    TEST_ASSERT_EQUAL(QueueStatus::EMPTY, queue.peek(val));
 }
 
-void test_should_return_empty_status_when_popping_empty_queue() {
-    uint8_t val = 99;
+void test_should_add_single_item() {
+    const uint8_t item = 42;
 
-    QueueStatus status = queue.pop(val);
-
-    TEST_ASSERT_EQUAL(QueueStatus::EMPTY, status);
+    TEST_ASSERT_EQUAL(QueueStatus::OK, queue.insert(item));
+    TEST_ASSERT_EQUAL(1, queue.size());
+    TEST_ASSERT_TRUE(queue.contains(item));
 }
 
-void test_should_return_empty_status_when_peeking_empty_queue() {
-    uint8_t val = 99;
-
-    QueueStatus status = queue.peek(val);
-
-    TEST_ASSERT_EQUAL(QueueStatus::EMPTY, status);
-}
-
-void test_should_add_element_when_queue_has_space() {
-    QueueStatus status = queue.insert(42);
-
-    TEST_ASSERT_EQUAL(QueueStatus::OK, status);
-    TEST_ASSERT_FALSE(queue.isEmpty());
-}
-
-void test_should_not_remove_element_on_peek() {
+void test_should_return_without_removing_during_peek() {
     queue.insert(42);
-    uint8_t val = 0;
+    uint8_t val;
 
-    QueueStatus status = queue.peek(val);
-
-    TEST_ASSERT_EQUAL(QueueStatus::OK, status);
+    TEST_ASSERT_EQUAL(QueueStatus::OK, queue.peek(val));
     TEST_ASSERT_EQUAL(42, val);
-    TEST_ASSERT_FALSE(queue.isEmpty());
+    TEST_ASSERT_EQUAL(1, queue.size());
 }
 
-void test_should_remove_element_on_pop() {
+void test_should_remove_item_during_pop() {
     queue.insert(42);
-    uint8_t val = 0;
+    uint8_t val;
 
-    QueueStatus status = queue.pop(val);
-
-    TEST_ASSERT_EQUAL(QueueStatus::OK, status);
+    TEST_ASSERT_EQUAL(QueueStatus::OK, queue.pop(val));
     TEST_ASSERT_EQUAL(42, val);
     TEST_ASSERT_TRUE(queue.isEmpty());
 }
 
-void test_should_output_items_in_fifo_order() {
+void test_should_provide_items_in_fifo_order() {
     queue.insert(10);
     queue.insert(20);
     queue.insert(30);
@@ -86,25 +68,25 @@ void test_should_output_items_in_fifo_order() {
     TEST_ASSERT_EQUAL(30, TestUtils::popValue(queue));
 }
 
-void test_should_refuse_insertion_when_queue_is_full() {
-    TestUtils::fillQueue(queue, 0, QUEUE_CAPACITY);
+void test_should_signal_full_status() {
+    TestUtils::fill(queue, QUEUE_CAPACITY);
 
-    QueueStatus status = queue.insert(99);
-
-    TEST_ASSERT_EQUAL(QueueStatus::FULL, status);
+    TEST_ASSERT_TRUE(queue.isFull());
+    TEST_ASSERT_EQUAL(QueueStatus::FULL, queue.insert(99));
 }
 
-void test_should_wrap_correctly_when_capacity_is_exceeded() {
-    TestUtils::fillQueue(queue, 0, QUEUE_CAPACITY); 
-    TestUtils::popValue(queue);                   
-    TestUtils::popValue(queue);                   
+void test_should_reuse_memory_circularly_after_wrapping() {
+    TestUtils::fill(queue, QUEUE_CAPACITY); // 1, 2, 3, 4, 5
+
+    TestUtils::popValue(queue);
+    TestUtils::popValue(queue);
     
-    queue.insert(100);             
-    queue.insert(200);             
+    TEST_ASSERT_EQUAL(QueueStatus::OK, queue.insert(100));
+    TEST_ASSERT_EQUAL(QueueStatus::OK, queue.insert(200));
     
-    TEST_ASSERT_EQUAL(2, TestUtils::popValue(queue));
     TEST_ASSERT_EQUAL(3, TestUtils::popValue(queue));
     TEST_ASSERT_EQUAL(4, TestUtils::popValue(queue));
+    TEST_ASSERT_EQUAL(5, TestUtils::popValue(queue));
     TEST_ASSERT_EQUAL(100, TestUtils::popValue(queue));
     TEST_ASSERT_EQUAL(200, TestUtils::popValue(queue));
     TEST_ASSERT_TRUE(queue.isEmpty());
@@ -112,18 +94,15 @@ void test_should_wrap_correctly_when_capacity_is_exceeded() {
 
 void setup() {
     delay(2000);
-
     UNITY_BEGIN();
 
-    RUN_TEST(test_should_be_empty_on_initialization);
-    RUN_TEST(test_should_return_empty_status_when_popping_empty_queue);
-    RUN_TEST(test_should_return_empty_status_when_peeking_empty_queue);
-    RUN_TEST(test_should_add_element_when_queue_has_space);
-    RUN_TEST(test_should_not_remove_element_on_peek);
-    RUN_TEST(test_should_remove_element_on_pop);
-    RUN_TEST(test_should_output_items_in_fifo_order);
-    RUN_TEST(test_should_refuse_insertion_when_queue_is_full);
-    RUN_TEST(test_should_wrap_correctly_when_capacity_is_exceeded);
+    RUN_TEST(test_should_be_empty_on_init);
+    RUN_TEST(test_should_add_single_item);
+    RUN_TEST(test_should_return_without_removing_during_peek);
+    RUN_TEST(test_should_remove_item_during_pop);
+    RUN_TEST(test_should_provide_items_in_fifo_order);
+    RUN_TEST(test_should_signal_full_status);
+    RUN_TEST(test_should_reuse_memory_circularly_after_wrapping);
 
     UNITY_END();
 }

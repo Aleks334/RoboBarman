@@ -19,8 +19,10 @@ class Queue {
         QueueStatus insert(uint8_t item);
         QueueStatus pop(uint8_t& item);
         QueueStatus peek(uint8_t& item) const;
+
         bool isFull() const;
         bool isEmpty() const;
+        
         bool contains(uint8_t item) const;
         uint8_t size() const;
 };
