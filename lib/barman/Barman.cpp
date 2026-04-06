@@ -1,11 +1,13 @@
 #include "Barman.h"
 
-Barman::Barman(Queue& orderQueue) 
+Barman::Barman(Queue& orderQueue, uint32_t moveDuration, uint32_t fillDuration) 
     : queue(orderQueue), 
       currentState(BarmanState::WAITING_FOR_TASK), 
       currentlyServed(NO_STATION), 
       actionStartTime(0),
-      finishedFillingFlag(false) {}
+      finishedFillingFlag(false),
+      moveDuration(moveDuration),
+      fillDuration(fillDuration) {}
 
 void Barman::update(unsigned long currentMillis) {
     switch (currentState) {
@@ -21,14 +23,14 @@ void Barman::update(unsigned long currentMillis) {
             break;
 
         case BarmanState::MOVING:
-            if (currentMillis - actionStartTime >= ARM_MOVEMENT_DURATION) {
+            if (currentMillis - actionStartTime >= moveDuration) {
                 actionStartTime = currentMillis;
                 currentState = BarmanState::FILLING;
             }
             break;
 
         case BarmanState::FILLING:
-            if (currentMillis - actionStartTime >= FILLING_DURATION) {
+            if (currentMillis - actionStartTime >= fillDuration) {
                 finishedFillingFlag = true; 
                 currentState = BarmanState::WAITING_FOR_TASK;
             }

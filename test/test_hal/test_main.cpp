@@ -7,9 +7,9 @@
 #include "ServoMotor.h"
 
 const uint8_t TEST_LED_PIN = 13;
-const uint8_t TEST_RGB_LED_R_PIN = 1;
-const uint8_t TEST_RGB_LED_G_PIN = 2;
-const uint8_t TEST_RGB_LED_B_PIN = 3;
+const uint8_t TEST_R_LED_PIN = 1;
+const uint8_t TEST_G_LED_PIN = 2;
+const uint8_t TEST_B_LED_PIN = 3;
 
 const uint8_t TEST_PUMP_PIN = 8;
 const uint8_t TEST_SENSOR_PIN = 9;
@@ -24,7 +24,7 @@ ServoMotor* testServo;
 
 void setUp() {
     testLed = new Led(TEST_LED_PIN);
-    testRgbLed = new RgbLed(TEST_RGB_LED_R_PIN, TEST_RGB_LED_G_PIN, TEST_RGB_LED_B_PIN);
+    testRgbLed = new RgbLed(TEST_R_LED_PIN, TEST_G_LED_PIN, TEST_B_LED_PIN);
 
     testPump = new Pump(TEST_PUMP_PIN);
     testSensor = new Sensor(TEST_SENSOR_PIN);

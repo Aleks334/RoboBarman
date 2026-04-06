@@ -19,11 +19,11 @@ private:
     unsigned long actionStartTime;
     bool finishedFillingFlag;
 
-    static constexpr unsigned long ARM_MOVEMENT_DURATION = 2000;
-    static constexpr unsigned long FILLING_DURATION = 3000;
+    uint32_t moveDuration;
+    uint32_t fillDuration;
 
 public:
-    Barman(Queue& orderQueue);
+    Barman(Queue& orderQueue, uint32_t moveDuration, uint32_t fillDuration);
 
     void update(unsigned long currentMillis);
 

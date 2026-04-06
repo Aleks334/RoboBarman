@@ -1,6 +1,7 @@
 #include <unity.h>
 #include "Barman.h"
 #include "Queue.h"
+#include <Arduino.h>
 
 const unsigned long MOVE_TIME = 2000;
 const unsigned long FILL_TIME = 3000;
@@ -11,7 +12,7 @@ Barman* barman;
 
 void setUp() {
     queue = new Queue();
-    barman = new Barman(*queue);
+    barman = new Barman(*queue, MOVE_TIME, FILL_TIME);
 }
 
 void tearDown() {
@@ -35,8 +36,8 @@ void test_should_transition_to_moving_when_order_received() {
 
 void test_should_stay_moving_until_time_elapses() {
     queue->insert(1);
+
     barman->update(1000);
-    
     barman->update(1000 + MOVE_TIME - 1); 
     
     TEST_ASSERT_EQUAL(BarmanState::MOVING, barman->getState());
@@ -44,8 +45,8 @@ void test_should_stay_moving_until_time_elapses() {
 
 void test_should_transition_to_filling_after_move_finishes() {
     queue->insert(1);
+
     barman->update(1000); 
-    
     barman->update(1000 + MOVE_TIME); 
     
     TEST_ASSERT_EQUAL(BarmanState::FILLING, barman->getState());
@@ -53,9 +54,9 @@ void test_should_transition_to_filling_after_move_finishes() {
 
 void test_should_transition_back_to_waiting_after_filling_finishes() {
     queue->insert(1);
+
     barman->update(1000);             
     barman->update(1000 + MOVE_TIME);
-    
     barman->update(1000 + MOVE_TIME + FILL_TIME); 
     
     TEST_ASSERT_EQUAL(BarmanState::WAITING_FOR_TASK, barman->getState());
@@ -64,6 +65,7 @@ void test_should_transition_back_to_waiting_after_filling_finishes() {
 
 void test_should_fire_finished_filling_flag_exactly_once() {
     queue->insert(1);
+    
     barman->update(0); 
     barman->update(MOVE_TIME); 
     barman->update(MOVE_TIME + FILL_TIME);
