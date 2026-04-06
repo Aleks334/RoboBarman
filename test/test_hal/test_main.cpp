@@ -80,6 +80,14 @@ void test_should_default_to_inactive_when_unpressed() {
     TEST_ASSERT_FALSE(testSensor->isActive());
 }
 
+void test_sensor_should_return_simulated_value() {
+    testSensor->simulateState(true);
+    TEST_ASSERT_TRUE(testSensor->isActive());
+    
+    testSensor->simulateState(false);
+    TEST_ASSERT_FALSE(testSensor->isActive());
+}
+
 void test_should_set_and_read_servo_angle() {
     testServo->setAngle(90);
     TEST_ASSERT_EQUAL(90, testServo->getAngle());
