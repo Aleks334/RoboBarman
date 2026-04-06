@@ -28,6 +28,13 @@ More about [PlatformIO CLI](https://docs.platformio.org/en/latest/core/index.htm
 > [!NOTE]
 > Please make sure that your board is detected by PlatformIO by running: `pio device list`.
 
+## Testing
+
+To run unit tests located in `test/` directory use this command:
+```bash
+pio test -e uno
+```
+
 ## Project documentation
 
 ### Setup
