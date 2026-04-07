@@ -3,26 +3,32 @@
 
 namespace GlobalConfig {
 
-    static constexpr uint8_t NUM_STATIONS = 3;
-    static constexpr uint8_t NO_STATION = 255;
+    static constexpr uint8_t QUEUE_CAPACITY = 5;
+    static constexpr uint8_t NUM_STATIONS = 2;
 
     static constexpr uint8_t PIN_PUMP = 8;
     static constexpr uint8_t PIN_SERVO = 9;
 
-    static constexpr uint8_t PINS_SENSOR[NUM_STATIONS] = {2, 3, 4}; 
-    
-    static constexpr uint8_t PINS_RGB_R[NUM_STATIONS] = {A0, A3, 10}; 
-    static constexpr uint8_t PINS_RGB_G[NUM_STATIONS] = {A1, A4, 11};
-    static constexpr uint8_t PINS_RGB_B[NUM_STATIONS] = {A2, A5, 12};
+    struct StationPins {
+        uint8_t sensor;
+        uint8_t red;
+        uint8_t green;
+        uint8_t blue;
+    };
+
+    static constexpr StationPins STATIONS_CONFIG[NUM_STATIONS] = {
+        {2, A0, A1, A2},
+        {3, A3, A4, A5}
+    };
 
     static constexpr bool LED_COMMON_ANODE = false; 
 
-    static constexpr uint32_t MOVE_DURATION_MS = 2000; 
+    static constexpr uint32_t MOVE_DURATION_MS = 800; 
     static constexpr uint32_t FILL_DURATION_MS = 3000;
-    static constexpr uint16_t LED_BLINK_INTERVAL_MS = 300; 
+    static constexpr uint16_t LED_BLINK_INTERVAL_MS = 250; 
 
     static constexpr uint8_t SERVO_POS_IDLE = 0;   
-    static constexpr uint8_t SERVO_POS_STATIONS[NUM_STATIONS] = {30, 90, 150};
+    static constexpr uint8_t SERVO_STATIONS_DEGREE_ANGLES[NUM_STATIONS] = {60, 120};
 
-    static constexpr uint16_t SENSOR_DEBOUNCE_MS = 50;   
+    static constexpr uint16_t SENSOR_DEBOUNCE_MS = 100;   
 }

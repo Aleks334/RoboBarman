@@ -11,7 +11,7 @@ enum class QueueStatus : uint8_t
 class Queue
 {
 private:
-    const uint8_t* arr;
+    uint8_t* arr;
     uint8_t capacity;
     uint8_t frontIndex;
     uint8_t currentSize;
