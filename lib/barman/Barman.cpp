@@ -1,4 +1,5 @@
 #include "Barman.h"
+#include <Arduino.h>
 
 Barman::Barman(Queue& orderQueue, uint32_t moveDuration, uint32_t fillDuration, Pump& pump, ServoMotor& servo, const uint8_t* stationsDegreeAngles, uint8_t idlePosition) 
     : queue(orderQueue), 
@@ -54,6 +55,16 @@ void Barman::update(unsigned long currentMillis) {
             }
             break;
     }
+}
+
+void Barman::abort() {
+    pump.stop();
+    servo.setAngleInstantly(idlePosition);
+
+    currentState = BarmanState::WAITING_FOR_TASK;
+    currentlyServedStationId = NO_STATION;
+    hasFinishedFilling = false;
+    Serial.println("[ALERT]: Barman service aborted!");
 }
 
 bool Barman::consumeHasFinishedFillingFlag() {

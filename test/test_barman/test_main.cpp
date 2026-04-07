@@ -128,6 +128,21 @@ void test_should_handle_multiple_stations_in_sequence() {
     TEST_ASSERT_EQUAL(station2Id, barman->getCurrentlyServedStationId());
 }
 
+void test_should_reset_to_waiting_state_when_aborted() {
+    uint8_t stationId = 1;
+    queue->insert(stationId);
+
+    barman->update(clock);
+    tickFastForward(TEST_MOVE_TIME);
+    barman->update(clock);
+    TEST_ASSERT_EQUAL(BarmanState::FILLING, barman->getState());
+
+    barman->abort();
+    TEST_ASSERT_EQUAL(BarmanState::WAITING_FOR_TASK, barman->getState());
+    TEST_ASSERT_EQUAL(Barman::NO_STATION, barman->getCurrentlyServedStationId());
+    TEST_ASSERT_FALSE(barman->consumeHasFinishedFillingFlag());
+}
+
 void setup() {
     delay(2000);
     UNITY_BEGIN();

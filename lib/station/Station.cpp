@@ -33,8 +33,8 @@ void Station::update(unsigned long currentMillis) {
 
         case StationState::IN_PROGRESS:
             if (!cupDetected) {
+                barman.abort();
                 state = StationState::IDLE;
-                //TODO: barman doesn't know that station is empty and still fills it with liquid
             } 
 
             if (barman.getCurrentlyServedStationId() == id && barman.consumeHasFinishedFillingFlag()) {

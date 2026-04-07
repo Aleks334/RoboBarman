@@ -36,6 +36,7 @@ public:
 
     void begin();
     void update(unsigned long currentMillis);
+    void abort();
 
     BarmanState getState() const;
     uint8_t getCurrentlyServedStationId() const;
