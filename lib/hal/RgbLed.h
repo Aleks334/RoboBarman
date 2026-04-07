@@ -6,7 +6,6 @@ enum class Color : uint8_t {
     RED,
     GREEN,
     BLUE,
-    YELLOW,
     WHITE
 };
 

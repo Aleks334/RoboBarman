@@ -7,6 +7,8 @@
 #include "RgbLed.h"
 #include "Barman.h"
 #include "Station.h"
+// #include "avr8-stub.h"
+// #include "app_api.h"
 
 using namespace GlobalConfig;
 
@@ -28,6 +30,7 @@ Barman barman(
 Station* stations[NUM_STATIONS];
 
 void setup() {
+  //debug_init();
     Serial.begin(9600);
     Serial.println(F("=== AUTOMATIC BARMAN SYSTEM STARTING... ==="));
 

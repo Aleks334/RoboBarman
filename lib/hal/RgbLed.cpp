@@ -25,9 +25,6 @@ void RgbLed::setColor(Color color) {
         case Color::BLUE:   
             b = true; 
             break;
-        case Color::YELLOW: 
-            r = g = true; 
-            break;
         case Color::WHITE:  
             r = g = b = true; 
             break;

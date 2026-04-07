@@ -4,7 +4,7 @@
 namespace GlobalConfig {
 
     static constexpr uint8_t QUEUE_CAPACITY = 5;
-    static constexpr uint8_t NUM_STATIONS = 2;
+    static constexpr uint8_t NUM_STATIONS = 1;
 
     static constexpr uint8_t PIN_PUMP = 8;
     static constexpr uint8_t PIN_SERVO = 9;
@@ -17,18 +17,17 @@ namespace GlobalConfig {
     };
 
     static constexpr StationPins STATIONS_CONFIG[NUM_STATIONS] = {
-        {2, A0, A1, A2},
-        {3, A3, A4, A5}
+        {2, A0, A1, A2}
     };
 
-    static constexpr bool LED_COMMON_ANODE = false; 
+    static constexpr bool LED_COMMON_ANODE = true; 
 
-    static constexpr uint32_t MOVE_DURATION_MS = 800; 
+    static constexpr uint32_t MOVE_DURATION_MS = 1000; 
     static constexpr uint32_t FILL_DURATION_MS = 3000;
     static constexpr uint16_t LED_BLINK_INTERVAL_MS = 250; 
 
-    static constexpr uint8_t SERVO_POS_IDLE = 0;   
-    static constexpr uint8_t SERVO_STATIONS_DEGREE_ANGLES[NUM_STATIONS] = {60, 120};
+    static constexpr uint8_t SERVO_POS_IDLE = 90;   
+    static constexpr uint8_t SERVO_STATIONS_DEGREE_ANGLES[NUM_STATIONS] = {155};
 
     static constexpr uint16_t SENSOR_DEBOUNCE_MS = 100;   
 }

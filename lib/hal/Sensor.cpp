@@ -6,7 +6,7 @@ Sensor::Sensor(uint8_t pin, uint16_t debounceDelayMs)
       isSimulationMode(false), simulatedState(false) {}
 
 void Sensor::begin() {
-    pinMode(pin, INPUT);
+    pinMode(pin, INPUT_PULLUP);
     lastRawState = readSensorValue();
     debouncedState = lastRawState;
 }
