@@ -3,9 +3,9 @@
 Barman::Barman(Queue& orderQueue, uint32_t moveDuration, uint32_t fillDuration) 
     : queue(orderQueue), 
       currentState(BarmanState::WAITING_FOR_TASK), 
-      currentlyServed(NO_STATION), 
+      currentlyServedStationId(NO_STATION), 
       actionStartTime(0),
-      finishedFillingFlag(false),
+      hasFinishedFilling(false),
       moveDuration(moveDuration),
       fillDuration(fillDuration) {}
 
@@ -13,9 +13,10 @@ void Barman::update(unsigned long currentMillis) {
     switch (currentState) {
         case BarmanState::WAITING_FOR_TASK:
             if (!queue.isEmpty()) {
-                uint8_t stationIndex;
-                if (queue.pop(stationIndex) == QueueStatus::OK) {
-                    currentlyServed = stationIndex;
+                uint8_t stationId;
+
+                if (queue.pop(stationId) == QueueStatus::OK) {
+                    currentlyServedStationId = stationId;
                     actionStartTime = currentMillis;
                     currentState = BarmanState::MOVING;
                 }
@@ -23,7 +24,7 @@ void Barman::update(unsigned long currentMillis) {
             break;
 
         case BarmanState::MOVING:
-            if (currentMillis - actionStartTime >= moveDuration) {
+            if ((currentMillis - actionStartTime) >= moveDuration) {
                 actionStartTime = currentMillis;
                 currentState = BarmanState::FILLING;
             }
@@ -31,16 +32,17 @@ void Barman::update(unsigned long currentMillis) {
 
         case BarmanState::FILLING:
             if (currentMillis - actionStartTime >= fillDuration) {
-                finishedFillingFlag = true; 
+                hasFinishedFilling = true; 
+                currentlyServedStationId = NO_STATION;
                 currentState = BarmanState::WAITING_FOR_TASK;
             }
             break;
     }
 }
 
-bool Barman::hasFinishedFilling() {
-    if (finishedFillingFlag) {
-        finishedFillingFlag = false;
+bool Barman::getHasFinishedFilling() {
+    if (hasFinishedFilling) {
+        hasFinishedFilling = false;
         return true;
     }
     return false;
@@ -50,6 +52,6 @@ BarmanState Barman::getState() const {
     return currentState;
 }
 
-uint8_t Barman::getCurrentlyServed() const {
-    return currentlyServed;
+uint8_t Barman::getCurrentlyServedStationId() const {
+    return currentlyServedStationId;
 }

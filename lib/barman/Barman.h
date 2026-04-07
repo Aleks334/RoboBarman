@@ -13,22 +13,22 @@ private:
     Queue& queue;
     BarmanState currentState;
     
-    uint8_t currentlyServed; 
-    static constexpr uint8_t NO_STATION = 255;
+    uint8_t currentlyServedStationId; 
 
     unsigned long actionStartTime;
-    bool finishedFillingFlag;
+    bool hasFinishedFilling;
 
     uint32_t moveDuration;
     uint32_t fillDuration;
 
 public:
+    static constexpr uint8_t NO_STATION = 255;
+
     Barman(Queue& orderQueue, uint32_t moveDuration, uint32_t fillDuration);
 
     void update(unsigned long currentMillis);
 
     BarmanState getState() const;
-    uint8_t getCurrentlyServed() const;
-    
-    bool hasFinishedFilling(); 
+    uint8_t getCurrentlyServedStationId() const;
+    bool getHasFinishedFilling(); 
 };
