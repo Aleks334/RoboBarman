@@ -10,7 +10,8 @@ void Station::begin() {
 }
 
 void Station::update(unsigned long currentMillis) {
-    bool cupDetected = sensor.isActive();
+    sensor.update(currentMillis);
+    bool cupDetected = sensor.hasDetectedObject();
 
     switch (state) {
         case StationState::IDLE:
@@ -33,6 +34,7 @@ void Station::update(unsigned long currentMillis) {
         case StationState::IN_PROGRESS:
             if (!cupDetected) {
                 state = StationState::IDLE;
+                //TODO: barman doesn't know that station is empty and still fills it with liquid
             } 
 
             if (barman.getCurrentlyServedStationId() == id && barman.consumeHasFinishedFillingFlag()) {

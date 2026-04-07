@@ -17,9 +17,9 @@ namespace GlobalConfig {
 
     static constexpr bool LED_COMMON_ANODE = false; 
 
-    static constexpr uint32_t MOVE_DURATION = 2000; 
-    static constexpr uint32_t FILL_DURATION = 3000;
-    static constexpr uint16_t LED_FLASH_INTERVAL = 300; 
+    static constexpr uint32_t MOVE_DURATION_MS = 2000; 
+    static constexpr uint32_t FILL_DURATION_MS = 3000;
+    static constexpr uint16_t LED_BLINK_INTERVAL_MS = 300; 
 
     static constexpr uint8_t SERVO_POS_IDLE = 0;   
     static constexpr uint8_t SERVO_POS_STATIONS[NUM_STATIONS] = {30, 90, 150};

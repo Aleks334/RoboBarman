@@ -76,16 +76,12 @@ void test_should_stop_pump() {
     TEST_ASSERT_FALSE(testPump->isRunning());
 }
 
-void test_should_default_to_inactive_when_unpressed() {
-    TEST_ASSERT_FALSE(testSensor->isActive());
-}
-
 void test_sensor_should_return_simulated_value() {
     testSensor->simulateState(true);
-    TEST_ASSERT_TRUE(testSensor->isActive());
+    TEST_ASSERT_TRUE(testSensor->hasDetectedObject());
     
     testSensor->simulateState(false);
-    TEST_ASSERT_FALSE(testSensor->isActive());
+    TEST_ASSERT_FALSE(testSensor->hasDetectedObject());
 }
 
 void test_should_set_and_read_servo_angle() {
@@ -126,8 +122,6 @@ void setup() {
 
     RUN_TEST(test_should_start_pump);
     RUN_TEST(test_should_stop_pump);
-
-    RUN_TEST(test_should_default_to_inactive_when_unpressed);
 
     RUN_TEST(test_should_set_and_read_servo_angle);
     RUN_TEST(test_should_clamp_servo_angle_to_180);

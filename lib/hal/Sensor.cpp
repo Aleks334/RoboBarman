@@ -1,17 +1,34 @@
 #include "Sensor.h"
 
-Sensor::Sensor(uint8_t pin) 
-    : pin(pin), isSimulationMode(false), simulatedState(false) {}
+Sensor::Sensor(uint8_t pin, uint16_t debounceDelayMs) 
+    : pin(pin), debounceDelay(debounceDelayMs), 
+      lastRawState(false), debouncedState(false), lastDebounceTime(0),
+      isSimulationMode(false), simulatedState(false) {}
 
 void Sensor::begin() {
-    pinMode(pin, INPUT_PULLUP);
+    pinMode(pin, INPUT);
+    lastRawState = readSensorValue();
+    debouncedState = lastRawState;
 }
 
-bool Sensor::isActive() const {
-    if (isSimulationMode) {
-        return simulatedState;
+void Sensor::update(unsigned long currentMillis) {
+    if (isSimulationMode) return;
+
+    bool currentState = readSensorValue();
+
+    if (currentState != lastRawState) {
+        lastDebounceTime = currentMillis;
     }
-    return digitalRead(pin) == LOW; 
+
+    if ((currentMillis - lastDebounceTime) > debounceDelay) {
+        debouncedState = currentState;
+    }
+
+    lastRawState = currentState;
+}
+
+bool Sensor::hasDetectedObject() const {
+    return isSimulationMode ? simulatedState : debouncedState;
 }
 
 void Sensor::simulateState(bool state) {
@@ -21,4 +38,8 @@ void Sensor::simulateState(bool state) {
 
 void Sensor::disableSimulation() {
     isSimulationMode = false;
+}
+
+bool Sensor::readSensorValue() {
+    return digitalRead(pin) == LOW;
 }

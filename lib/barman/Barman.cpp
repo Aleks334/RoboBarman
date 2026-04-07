@@ -33,7 +33,6 @@ void Barman::update(unsigned long currentMillis) {
         case BarmanState::FILLING:
             if ((currentMillis - actionStartTime) >= fillDuration) {
                 hasFinishedFilling = true; 
-             //   currentlyServedStationId = NO_STATION; // BUG HERE!!!
                 currentState = BarmanState::WAITING_FOR_TASK;
             }
             break;
