@@ -35,6 +35,10 @@ To run unit tests located in `test/` directory use this command:
 pio test -e uno
 ```
 
+## Configuration
+
+To adjust the behaviour or change pins please edit `GlobalConfig.h` file [here](/include/GlobalConfig.h).
+
 ## Project documentation
 
 ### Setup
@@ -65,7 +69,7 @@ stateDiagram-v2
     READY --> IDLE
 ```
 
-Bartender States:
+Barman states:
 -	WAITING_FOR_TASK
 -	MOVING
 -	FILLING
@@ -105,27 +109,27 @@ For each station (i) in the stations array:
 
 
 // Queue and dispensing handling.
-If BARTENDER_STATE == WAITING_FOR_TASK AND queue_length > 0:
+If BARMAN_STATE == WAITING_FOR_TASK AND queue_length > 0:
     currently_served = Pull and remove the first element from the queue
     If stations[currently_served] == OCCUPIED:
         stations[currently_served] = IN_PROGRESS
         led[currently_served] = FLASHING_RED
         Move arm to position(currently_served)
         Save current time to: movement_start_time
-        BARTENDER_STATE = MOVING
+        BARMAN_STATE = MOVING
 
-If BARTENDER_STATE == MOVING:
+If BARMAN_STATE == MOVING:
     If (current_time - movement_start_time) >= ARM_MOVEMENT_DURATION:
         Turn pump ON
         Save current time to: pump_start_time
-        BARTENDER_STATE = FILLING
+        BARMAN_STATE = FILLING
 
-If BARTENDER_STATE == FILLING:
+If BARMAN_STATE == FILLING:
    If (current_time - pump_start_time) >= FILLING_DURATION:
         Turn pump OFF
         stations[currently_served] = READY
         led[currently_served] = FLASHING_GREEN
-        BARTENDER_STATE = WAITING_FOR_TASK
+        BARMAN_STATE = WAITING_FOR_TASK
         currently_served = NULL
 ```
 
