@@ -31,6 +31,10 @@ void Station::update(unsigned long currentMillis) {
             break;
 
         case StationState::IN_PROGRESS:
+            if (!cupDetected) {
+                state = StationState::IDLE;
+            } 
+
             if (barman.getCurrentlyServedStationId() == id && barman.consumeHasFinishedFillingFlag()) {
                 state = StationState::READY;
             }

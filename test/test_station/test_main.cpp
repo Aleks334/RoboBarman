@@ -102,21 +102,91 @@ void test_should_led_be_red_when_station_is_occupied() {
 
 void test_should_blink_red_when_in_progress() {
     sensor->simulateState(true);
-    
     station->update(clock);
     barman->update(clock);
-    tick(0);
-    station->update(clock);
-    tickFastForward(TEST_LED_BLINK_INTERVAL - 1);
-    TEST_ASSERT_EQUAL(Color::OFF, led->getColor());
     
     tick();
+    station->update(clock);
+    TEST_ASSERT_EQUAL(StationState::IN_PROGRESS, station->getState());
+    TEST_ASSERT_EQUAL(Color::OFF, led->getColor());
+    
+    tickFastForward(TEST_LED_BLINK_INTERVAL);
     station->update(clock);
     TEST_ASSERT_EQUAL(Color::RED, led->getColor());
 
     tickFastForward(TEST_LED_BLINK_INTERVAL);
     station->update(clock);
     TEST_ASSERT_EQUAL(Color::OFF, led->getColor());
+}
+
+void test_should_blink_green_when_ready() {
+    sensor->simulateState(true);
+    station->update(clock);
+    barman->update(clock);
+
+    tick();
+    station->update(clock);
+    barman->update(clock);
+   
+    tickFastForward(TEST_MOVE_TIME);
+    station->update(clock);
+    barman->update(clock);
+
+    tickFastForward(TEST_FILLING_TIME);
+    barman->update(clock); // barman needs to set finished filling flag first, then station can consume it
+    station->update(clock);
+    TEST_ASSERT_EQUAL(StationState::READY, station->getState());
+
+    
+    TEST_ASSERT_EQUAL(Color::OFF, led->getColor());
+    tickFastForward(TEST_LED_BLINK_INTERVAL);
+    station->update(clock);
+    TEST_ASSERT_EQUAL(Color::GREEN, led->getColor());
+    tickFastForward(TEST_LED_BLINK_INTERVAL);
+    station->update(clock);
+    TEST_ASSERT_EQUAL(Color::OFF, led->getColor());
+}
+
+void test_should_abort_to_idle_if_cup_removed_during_in_progress() {
+    sensor->simulateState(true);
+    station->update(clock);
+    barman->update(clock);
+
+    tick();
+    station->update(clock);
+    barman->update(clock);
+    TEST_ASSERT_EQUAL(StationState::IN_PROGRESS, station->getState());
+
+    sensor->simulateState(false);
+    station->update(clock);
+    TEST_ASSERT_EQUAL(StationState::IDLE, station->getState());
+}
+
+void test_should_ignore_barman_serving_different_station() {
+    uint8_t anotherStationId = 99;
+    queue->insert(anotherStationId); 
+    barman->update(clock); 
+    TEST_ASSERT_EQUAL(anotherStationId, barman->getCurrentlyServedStationId());
+
+    sensor->simulateState(true);
+    station->update(clock);
+    TEST_ASSERT_EQUAL(StationState::OCCUPIED, station->getState());
+
+    tick();
+    barman->update(clock);
+    station->update(clock);
+    TEST_ASSERT_EQUAL(StationState::OCCUPIED, station->getState()); // station still waits in queue
+}
+
+void test_should_stay_idle_if_queue_is_full() {
+    uint8_t i = 0;
+    while(!queue->isFull()) {
+        queue->insert(i + 10); 
+    }
+
+    sensor->simulateState(true);
+    station->update(clock);
+    TEST_ASSERT_EQUAL(StationState::IDLE, station->getState());
 }
 
 void setup() {
@@ -129,6 +199,10 @@ void setup() {
     RUN_TEST(test_should_led_be_green_initially);
     RUN_TEST(test_should_led_be_red_when_station_is_occupied);
     RUN_TEST(test_should_blink_red_when_in_progress);
+    RUN_TEST(test_should_blink_green_when_ready);
+    RUN_TEST(test_should_abort_to_idle_if_cup_removed_during_in_progress);
+    RUN_TEST(test_should_ignore_barman_serving_different_station);
+    RUN_TEST(test_should_stay_idle_if_queue_is_full);
 
     UNITY_END();
 }
