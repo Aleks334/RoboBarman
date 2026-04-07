@@ -9,6 +9,8 @@ Queue* queue;
 Barman* barman;
 Station* station;
 
+const uint8_t TEST_QUEUE_CAPACITY = 5;
+
 const unsigned long TEST_MOVE_TIME = 20;
 const unsigned long TEST_FILLING_TIME = 30;
 const uint16_t TEST_LED_BLINK_INTERVAL = 10;
@@ -24,7 +26,7 @@ ServoMotor* servo;
 
 void setUp() {
     clock = 0;
-    queue = new Queue();
+    queue = new Queue(TEST_QUEUE_CAPACITY);
 
     sensor = new Sensor(13);
     led = new RgbLed(1, 2, 3);

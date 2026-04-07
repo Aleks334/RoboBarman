@@ -6,6 +6,8 @@
 
 using namespace TestUtils;
 
+const uint8_t TEST_QUEUE_CAPACITY = 5;
+
 const unsigned long TEST_MOVE_TIME = 50;
 const unsigned long TEST_FILLING_TIME = 100;
 
@@ -22,7 +24,7 @@ Barman* barman;
 
 void setUp() {
     clock = 0;
-    queue = new Queue();
+    queue = new Queue(TEST_QUEUE_CAPACITY);
     pump = new Pump(TEST_PUMP_PIN);
     servo = new ServoMotor(TEST_SERVO_PIN);
     

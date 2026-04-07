@@ -1,6 +1,12 @@
 #include "Queue.h"
 
-Queue::Queue() : frontIndex(0), currentSize(0) {}
+Queue::Queue(uint8_t capacity) : capacity(capacity), frontIndex(0), currentSize(0) {
+    arr = new uint8_t[capacity];
+}
+
+Queue::~Queue() {
+    delete[] arr;
+}
 
 QueueStatus Queue::insert(uint8_t item)
 {
@@ -9,7 +15,7 @@ QueueStatus Queue::insert(uint8_t item)
         return QueueStatus::FULL;
     }
 
-    uint8_t rearIndex = (frontIndex + currentSize) % CAPACITY;
+    uint8_t rearIndex = (frontIndex + currentSize) % capacity;
     arr[rearIndex] = item;
     currentSize++;
 
@@ -25,7 +31,7 @@ QueueStatus Queue::pop(uint8_t &item)
 
     item = arr[frontIndex];
 
-    frontIndex = (frontIndex + 1) % CAPACITY;
+    frontIndex = (frontIndex + 1) % capacity;
     currentSize--;
 
     return QueueStatus::OK;
@@ -44,7 +50,7 @@ QueueStatus Queue::peek(uint8_t &item) const
 
 bool Queue::isFull() const
 {
-    return currentSize == CAPACITY;
+    return currentSize == capacity;
 }
 
 bool Queue::isEmpty() const
@@ -61,7 +67,7 @@ bool Queue::contains(uint8_t item) const
 {
     for (uint8_t i = 0; i < currentSize; i++)
     {
-        uint8_t currentIndex = (frontIndex + i) % CAPACITY;
+        uint8_t currentIndex = (frontIndex + i) % capacity;
 
         if (arr[currentIndex] == item)
         {

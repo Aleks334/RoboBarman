@@ -1,12 +1,12 @@
 #include "unity.h"
 #include "queue.h"
 
-const uint8_t QUEUE_CAPACITY = 5;
+const uint8_t TEST_QUEUE_CAPACITY = 5;
 Queue* queue;
 
-namespace TestUtils
+namespace QueueTestUtils
 {
-    void fill(Queue &q, uint8_t count, uint8_t start = 1)
+    void fill(Queue &q, uint8_t count = TEST_QUEUE_CAPACITY, uint8_t start = 1)
     {
         for (uint8_t i = 0; i < count; i++)
             q.insert(start + i);
@@ -20,9 +20,11 @@ namespace TestUtils
     }
 }
 
+using namespace QueueTestUtils;
+
 void setUp()
 {
-    queue = new Queue();
+    queue = new Queue(TEST_QUEUE_CAPACITY);
 }
 
 void tearDown() 
@@ -76,14 +78,14 @@ void test_should_provide_items_in_fifo_order()
     queue->insert(20);
     queue->insert(30);
 
-    TEST_ASSERT_EQUAL(10, TestUtils::popValue(*queue));
-    TEST_ASSERT_EQUAL(20, TestUtils::popValue(*queue));
-    TEST_ASSERT_EQUAL(30, TestUtils::popValue(*queue));
+    TEST_ASSERT_EQUAL(10, popValue(*queue));
+    TEST_ASSERT_EQUAL(20, popValue(*queue));
+    TEST_ASSERT_EQUAL(30, popValue(*queue));
 }
 
 void test_should_signal_full_status()
 {
-    TestUtils::fill(*queue, QUEUE_CAPACITY);
+    fill(*queue);
 
     TEST_ASSERT_TRUE(queue->isFull());
     TEST_ASSERT_EQUAL(QueueStatus::FULL, queue->insert(99));
@@ -91,19 +93,19 @@ void test_should_signal_full_status()
 
 void test_should_reuse_memory_circularly_after_wrapping()
 {
-    TestUtils::fill(*queue, QUEUE_CAPACITY); // 1, 2, 3, 4, 5
+    fill(*queue); // 1,2,3,4,5
 
-    TestUtils::popValue(*queue);
-    TestUtils::popValue(*queue);
+    popValue(*queue);
+    popValue(*queue);
 
     TEST_ASSERT_EQUAL(QueueStatus::OK, queue->insert(100));
     TEST_ASSERT_EQUAL(QueueStatus::OK, queue->insert(200));
 
-    TEST_ASSERT_EQUAL(3, TestUtils::popValue(*queue));
-    TEST_ASSERT_EQUAL(4, TestUtils::popValue(*queue));
-    TEST_ASSERT_EQUAL(5, TestUtils::popValue(*queue));
-    TEST_ASSERT_EQUAL(100, TestUtils::popValue(*queue));
-    TEST_ASSERT_EQUAL(200, TestUtils::popValue(*queue));
+    TEST_ASSERT_EQUAL(3, popValue(*queue));
+    TEST_ASSERT_EQUAL(4, popValue(*queue));
+    TEST_ASSERT_EQUAL(5, popValue(*queue));
+    TEST_ASSERT_EQUAL(100, popValue(*queue));
+    TEST_ASSERT_EQUAL(200, popValue(*queue));
     TEST_ASSERT_TRUE(queue->isEmpty());
 }
 
