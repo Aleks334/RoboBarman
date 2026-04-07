@@ -13,24 +13,39 @@ const unsigned long TEST_MOVE_TIME = 20;
 const unsigned long TEST_FILLING_TIME = 30;
 const uint16_t TEST_LED_BLINK_INTERVAL = 10;
 
+const uint8_t TEST_PUMP_PIN = 8;
+const uint8_t TEST_SERVO_PIN = 9;
+
+uint8_t testStationsDegreeAngles[3] = {30, 90, 150};
+const uint8_t TEST_IDLE_POS = 0;
+
+Pump* pump;
+ServoMotor* servo;
+
 void setUp() {
     clock = 0;
+    queue = new Queue();
+
     sensor = new Sensor(13);
     led = new RgbLed(1, 2, 3);
 
-    queue = new Queue();
-    barman = new Barman(*queue, TEST_MOVE_TIME, TEST_FILLING_TIME);
+    pump = new Pump(TEST_PUMP_PIN);
+    servo = new ServoMotor(TEST_SERVO_PIN);
+    barman = new Barman(*queue, TEST_MOVE_TIME, TEST_FILLING_TIME, *pump, *servo, testStationsDegreeAngles, TEST_IDLE_POS);
+    barman->begin();
+
     station = new Station(0, *sensor, *led, *queue, *barman, TEST_LED_BLINK_INTERVAL);
-    
     station->begin();
 }
 
 void tearDown() {
     delete station; 
-    delete barman; 
-    delete queue; 
     delete led; 
     delete sensor;
+    delete barman;
+    delete queue;
+    delete pump;
+    delete servo;
 }
 
 void test_should_station_be_idle_initially() {
@@ -163,7 +178,7 @@ void test_should_abort_to_idle_if_cup_removed_during_in_progress() {
 }
 
 void test_should_ignore_barman_serving_different_station() {
-    uint8_t anotherStationId = 99;
+    uint8_t anotherStationId = 2;
     queue->insert(anotherStationId); 
     barman->update(clock); 
     TEST_ASSERT_EQUAL(anotherStationId, barman->getCurrentlyServedStationId());

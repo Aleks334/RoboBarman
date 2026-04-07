@@ -1,6 +1,8 @@
 #pragma once
-#include <stdint.h>
+#include <Arduino.h>
 #include "Queue.h"
+#include "Pump.h"
+#include "ServoMotor.h"
 
 enum class BarmanState : uint8_t {
     WAITING_FOR_TASK,
@@ -21,11 +23,18 @@ private:
     uint32_t moveDuration;
     uint32_t fillDuration;
 
+    Pump& pump;
+    ServoMotor& servo;
+
+    const uint8_t* stationsDegreeAngles;
+    uint8_t idlePosition;
+
 public:
     static constexpr uint8_t NO_STATION = 255;
 
-    Barman(Queue& orderQueue, uint32_t moveDuration, uint32_t fillDuration);
+    Barman(Queue& orderQueue, uint32_t moveDuration, uint32_t fillDuration, Pump& pump, ServoMotor& servo, const uint8_t* stationsDegreeAngles, uint8_t idlePosition);
 
+    void begin();
     void update(unsigned long currentMillis);
 
     BarmanState getState() const;

@@ -3,23 +3,38 @@
 #include "Queue.h"
 #include <Arduino.h>
 #include "../test_common.h"
+
 using namespace TestUtils;
 
 const unsigned long TEST_MOVE_TIME = 50;
 const unsigned long TEST_FILLING_TIME = 100;
 
+const uint8_t TEST_PUMP_PIN = 8;
+const uint8_t TEST_SERVO_PIN = 9;
+
+uint8_t testStationsDegreeAngles[3] = {30, 90, 150};
+const uint8_t TEST_IDLE_POS = 0;
+
 Queue* queue;
+Pump* pump;
+ServoMotor* servo;
 Barman* barman;
 
 void setUp() {
     clock = 0;
     queue = new Queue();
-    barman = new Barman(*queue, TEST_MOVE_TIME, TEST_FILLING_TIME);
+    pump = new Pump(TEST_PUMP_PIN);
+    servo = new ServoMotor(TEST_SERVO_PIN);
+    
+    barman = new Barman(*queue, TEST_MOVE_TIME, TEST_FILLING_TIME, *pump, *servo, testStationsDegreeAngles, TEST_IDLE_POS);
+    barman->begin();
 }
 
 void tearDown() {
     delete barman;
     delete queue;
+    delete pump;
+    delete servo;
 }
 
 void test_should_initialize_in_waiting_state() {
@@ -28,7 +43,7 @@ void test_should_initialize_in_waiting_state() {
 }
 
 void test_should_transition_to_moving_when_order_received() {
-    uint8_t stationId = 99;
+    uint8_t stationId = 1;
     queue->insert(stationId);
 
     barman->update(clock);
@@ -39,7 +54,7 @@ void test_should_transition_to_moving_when_order_received() {
 }
 
 void test_should_stay_moving_until_time_elapses() {
-    uint8_t stationId = 99;
+    uint8_t stationId = 1;
     queue->insert(stationId);
 
     barman->update(clock);
@@ -51,7 +66,7 @@ void test_should_stay_moving_until_time_elapses() {
 }
 
 void test_should_transition_to_filling_after_move_finishes() {
-    uint8_t stationId = 99;
+    uint8_t stationId = 1;
     queue->insert(stationId);
 
     barman->update(clock);
@@ -63,7 +78,7 @@ void test_should_transition_to_filling_after_move_finishes() {
 }
 
 void test_should_transition_back_to_waiting_after_process_finishes() {
-    uint8_t stationId = 99;
+    uint8_t stationId = 1;
     queue->insert(stationId);
 
     barman->update(clock);
@@ -78,7 +93,7 @@ void test_should_transition_back_to_waiting_after_process_finishes() {
 }
 
 void test_should_set_finished_filling_flag_exactly_once() {
-    uint8_t stationId = 99;
+    uint8_t stationId = 1;
     queue->insert(stationId);
 
     barman->update(clock);
@@ -93,8 +108,8 @@ void test_should_set_finished_filling_flag_exactly_once() {
 }
 
 void test_should_handle_multiple_stations_in_sequence() {
-    uint8_t station1Id = 10;
-    uint8_t station2Id = 20;
+    uint8_t station1Id = 1;
+    uint8_t station2Id = 2;
     queue->insert(station1Id);
     queue->insert(station2Id);
 
