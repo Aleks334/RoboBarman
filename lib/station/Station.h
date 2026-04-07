@@ -1,5 +1,4 @@
 #pragma once
-#include <stdint.h>
 #include "Sensor.h"
 #include "RgbLed.h"
 #include "Queue.h"
@@ -22,13 +21,14 @@ private:
     
     StationState state;
     
-    unsigned long lastFlashTime;
-    static constexpr uint16_t FLASH_INTERVAL = 300;
+    unsigned long lastBlinkTime;
+    uint16_t blinkInterval;
+    bool ledToggleState;
 
     void updateLed(unsigned long currentMillis);
 
 public:
-    Station(uint8_t id, Sensor& s, RgbLed& l, Queue& q, Barman& b);
+    Station(uint8_t id, Sensor& s, RgbLed& l, Queue& q, Barman& b, uint16_t blinkInterval);
     
     void begin();
     void update(unsigned long currentMillis);

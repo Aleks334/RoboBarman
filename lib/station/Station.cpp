@@ -1,8 +1,8 @@
 #include "Station.h"
 
-Station::Station(uint8_t id, Sensor& s, RgbLed& l, Queue& q, Barman& b)
-    : id(id), sensor(s), led(l), queue(q), barman(b), 
-      state(StationState::IDLE), lastFlashTime(0) {}
+Station::Station(uint8_t id, Sensor& s, RgbLed& l, Queue& q, Barman& b, uint16_t blinkInterval)
+    : id(id), sensor(s), led(l), queue(q), barman(b),
+      state(StationState::IDLE), lastBlinkTime(0), blinkInterval(blinkInterval), ledToggleState(false) {}
 
 void Station::begin() {
     sensor.begin();
@@ -24,20 +24,15 @@ void Station::update(unsigned long currentMillis) {
         case StationState::OCCUPIED:
             if (!cupDetected) {
                 state = StationState::IDLE;
-              
             } 
-            else if (barman.getCurrentlyServed() == id && 
-                     barman.getState() == BarmanState::MOVING) {
+            else if (barman.getCurrentlyServedStationId() == id) {
                 state = StationState::IN_PROGRESS;
             }
             break;
 
         case StationState::IN_PROGRESS:
-            if (barman.hasFinishedFilling() && barman.getCurrentlyServed() == id) {
+            if (barman.getCurrentlyServedStationId() == id && barman.consumeHasFinishedFillingFlag()) {
                 state = StationState::READY;
-            }
-            if (!cupDetected) {
-                state = StationState::IDLE;
             }
             break;
 
@@ -52,31 +47,23 @@ void Station::update(unsigned long currentMillis) {
 }
 
 void Station::updateLed(unsigned long currentMillis) {
+    if ((currentMillis - lastBlinkTime) >= blinkInterval) {
+        ledToggleState = !ledToggleState;
+        lastBlinkTime = currentMillis;
+    }
+
     switch (state) {
         case StationState::IDLE:
             led.setColor(Color::GREEN);
             break;
-
         case StationState::OCCUPIED:
             led.setColor(Color::RED);
             break;
-
         case StationState::IN_PROGRESS:
-            if (currentMillis - lastFlashTime >= FLASH_INTERVAL) {
-                static bool toggle = false;
-                toggle = !toggle;
-                led.setColor(toggle ? Color::RED : Color::OFF);
-                lastFlashTime = currentMillis;
-            }
+            led.setColor(ledToggleState ? Color::RED : Color::OFF);
             break;
-
         case StationState::READY:
-            if (currentMillis - lastFlashTime >= FLASH_INTERVAL) {
-                static bool toggle = false;
-                toggle = !toggle;
-                led.setColor(toggle ? Color::GREEN : Color::OFF);
-                lastFlashTime = currentMillis;
-            }
+            led.setColor(ledToggleState ? Color::GREEN : Color::OFF);
             break;
     }
 }

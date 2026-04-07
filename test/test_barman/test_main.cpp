@@ -31,8 +31,8 @@ void test_should_transition_to_moving_when_order_received() {
     uint8_t stationId = 99;
     queue->insert(stationId);
 
-    tick();
     barman->update(clock);
+    tick();
 
     TEST_ASSERT_EQUAL(BarmanState::MOVING, barman->getState());
     TEST_ASSERT_EQUAL(stationId, barman->getCurrentlyServedStationId());
@@ -42,10 +42,10 @@ void test_should_stay_moving_until_time_elapses() {
     uint8_t stationId = 99;
     queue->insert(stationId);
 
-    tick();
     barman->update(clock);
     tickFastForward(TEST_MOVE_TIME - 1);
     barman->update(clock);
+    tick();
 
     TEST_ASSERT_EQUAL(BarmanState::MOVING, barman->getState());
 }
@@ -54,10 +54,10 @@ void test_should_transition_to_filling_after_move_finishes() {
     uint8_t stationId = 99;
     queue->insert(stationId);
 
-    tick(); 
     barman->update(clock);
     tickFastForward(TEST_MOVE_TIME);
     barman->update(clock);
+    tick(); 
 
     TEST_ASSERT_EQUAL(BarmanState::FILLING, barman->getState());
 }
@@ -66,14 +66,14 @@ void test_should_transition_back_to_waiting_after_process_finishes() {
     uint8_t stationId = 99;
     queue->insert(stationId);
 
-    tick();
     barman->update(clock);
     tickFastForward(TEST_MOVE_TIME);
     barman->update(clock);
     tickFastForward(TEST_FILLING_TIME);
     barman->update(clock);
+    tick();
 
-    TEST_ASSERT_TRUE(barman->getHasFinishedFilling());
+    TEST_ASSERT_TRUE(barman->consumeHasFinishedFillingFlag());
     TEST_ASSERT_EQUAL(BarmanState::WAITING_FOR_TASK, barman->getState());
 }
 
@@ -81,15 +81,15 @@ void test_should_set_finished_filling_flag_exactly_once() {
     uint8_t stationId = 99;
     queue->insert(stationId);
 
-    tick();
     barman->update(clock);
     tickFastForward(TEST_MOVE_TIME);
     barman->update(clock);
     tickFastForward(TEST_FILLING_TIME);
     barman->update(clock);
-    
-    TEST_ASSERT_TRUE(barman->getHasFinishedFilling());
-    TEST_ASSERT_FALSE(barman->getHasFinishedFilling());
+    tick();
+
+    TEST_ASSERT_TRUE(barman->consumeHasFinishedFillingFlag());
+    TEST_ASSERT_FALSE(barman->consumeHasFinishedFillingFlag());
 }
 
 void test_should_handle_multiple_stations_in_sequence() {
@@ -98,7 +98,6 @@ void test_should_handle_multiple_stations_in_sequence() {
     queue->insert(station1Id);
     queue->insert(station2Id);
 
-    tick();
     barman->update(clock);
     tickFastForward(TEST_MOVE_TIME);
     barman->update(clock);
@@ -106,6 +105,7 @@ void test_should_handle_multiple_stations_in_sequence() {
     barman->update(clock);
     tick();
     barman->update(clock);
+    tick();
 
     TEST_ASSERT_EQUAL(BarmanState::MOVING, barman->getState());
     TEST_ASSERT_EQUAL(station2Id, barman->getCurrentlyServedStationId());

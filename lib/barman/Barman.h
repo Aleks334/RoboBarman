@@ -30,5 +30,5 @@ public:
 
     BarmanState getState() const;
     uint8_t getCurrentlyServedStationId() const;
-    bool getHasFinishedFilling(); 
+    bool consumeHasFinishedFillingFlag(); 
 };
