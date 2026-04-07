@@ -85,13 +85,67 @@ void test_sensor_should_return_simulated_value() {
 }
 
 void test_should_set_and_read_servo_angle() {
-    testServo->setAngle(90);
+    testServo->setAngleInstantly(90);
     TEST_ASSERT_EQUAL(90, testServo->getAngle());
 }
 
-void test_should_clamp_servo_angle_to_180() {
-    testServo->setAngle(200);
+void test_should_clamp_servo_angle_instantly_to_180() {
+    testServo->setAngleInstantly(200);
     TEST_ASSERT_EQUAL(180, testServo->getAngle());
+}
+
+void test_should_set_and_read_servo_angle_instantly() {
+    testServo->setAngleInstantly(90);
+    TEST_ASSERT_EQUAL(90, testServo->getAngle());
+    TEST_ASSERT_FALSE(testServo->getIsMoving());
+}
+
+void test_should_interpolate_to_higher_angle_over_time() {
+    testServo->setAngleInstantly(0);
+
+    uint8_t targetDegreeAngle = 100;
+    uint32_t moveDurationMs = 500;
+    testServo->moveTo(targetDegreeAngle, moveDurationMs);
+    TEST_ASSERT_TRUE(testServo->getIsMoving());
+    
+    delay(moveDurationMs / 2);
+    testServo->update(millis());
+    
+    // take into account error margin
+    uint8_t currentDegreeAngle = testServo->getAngle();
+    TEST_ASSERT_GREATER_THAN(40, currentDegreeAngle); 
+    TEST_ASSERT_LESS_THAN(60, currentDegreeAngle);
+    TEST_ASSERT_TRUE(testServo->getIsMoving());
+
+    delay((moveDurationMs / 2) + 10);
+    testServo->update(millis());
+    
+    TEST_ASSERT_EQUAL(targetDegreeAngle, testServo->getAngle());
+    TEST_ASSERT_FALSE(testServo->getIsMoving());
+}
+
+void test_should_interpolate_to_lower_angle_over_time() {
+    testServo->setAngleInstantly(180);
+    
+    uint8_t targetDegreeAngle = 0;
+    uint32_t moveDurationMs = 400;
+    testServo->moveTo(0, 400); 
+    TEST_ASSERT_TRUE(testServo->getIsMoving());
+    
+    delay(moveDurationMs / 2);
+    testServo->update(millis());
+    
+    // take into account error margin
+    uint8_t currentDegreeAngle = testServo->getAngle();
+    TEST_ASSERT_GREATER_THAN(80, currentDegreeAngle);
+    TEST_ASSERT_LESS_THAN(100, currentDegreeAngle);
+    TEST_ASSERT_TRUE(testServo->getIsMoving());
+
+    delay((moveDurationMs / 2) + 10);
+    testServo->update(millis());
+    
+    TEST_ASSERT_EQUAL(targetDegreeAngle, testServo->getAngle());
+    TEST_ASSERT_FALSE(testServo->getIsMoving());
 }
 
 void test_should_rgb_led_be_off_after_init() {
@@ -123,8 +177,10 @@ void setup() {
     RUN_TEST(test_should_start_pump);
     RUN_TEST(test_should_stop_pump);
 
-    RUN_TEST(test_should_set_and_read_servo_angle);
-    RUN_TEST(test_should_clamp_servo_angle_to_180);
+    RUN_TEST(test_should_set_and_read_servo_angle_instantly);
+    RUN_TEST(test_should_clamp_servo_angle_instantly_to_180);
+    RUN_TEST(test_should_interpolate_to_higher_angle_over_time);
+    RUN_TEST(test_should_interpolate_to_lower_angle_over_time);
 
     RUN_TEST(test_should_rgb_led_be_off_after_init);
     RUN_TEST(test_should_change_and_store_color);

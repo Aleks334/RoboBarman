@@ -30,12 +30,12 @@ Barman barman(
 Station* stations[NUM_STATIONS];
 
 void setup() {
-  //debug_init();
+    //debug_init();
     Serial.begin(9600);
     Serial.println(F("=== AUTOMATIC BARMAN SYSTEM STARTING... ==="));
 
     barman.begin();
-    Serial.println(F("Pump and servomotor initialized."));
+    Serial.println(F("[System]: Pump and servomotor initialized."));
 
     for (uint8_t stationId = 0; stationId < NUM_STATIONS; stationId++) {
         StationPins config = STATIONS_CONFIG[stationId];
@@ -54,9 +54,9 @@ void setup() {
         
         stations[stationId]->begin();
 
-        Serial.print("System: Station "); 
+        Serial.print("[System]: Station ID "); 
         Serial.print(stationId); 
-        Serial.println(" ready.");
+        Serial.println(" initialized.");
     }
 
     Serial.println(F("=== SYSTEM READY TO SERVE ==="));

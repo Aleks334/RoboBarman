@@ -7,9 +7,20 @@ private:
     uint8_t pin;
     Servo servo;
 
+    uint8_t startAngle;
+    uint8_t targetAngle;
+    uint32_t moveStartTime;
+    uint32_t duration;
+    bool isMoving;
+
 public:
     ServoMotor(uint8_t pin);
     void begin();
-    void setAngle(uint8_t angle);
+    void update(unsigned long currentMillis);
+
+    void moveTo(uint8_t angle, uint32_t moveDuration);
+    void setAngleInstantly(uint8_t angle);
+
+    bool getIsMoving() const;
     uint8_t getAngle();
 };

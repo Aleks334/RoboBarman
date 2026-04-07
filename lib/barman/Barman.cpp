@@ -16,10 +16,12 @@ Barman::Barman(Queue& orderQueue, uint32_t moveDuration, uint32_t fillDuration, 
 void Barman::begin() {
     pump.begin();
     servo.begin();
-    servo.setAngle(idlePosition);
+    servo.setAngleInstantly(idlePosition);
 }
 
 void Barman::update(unsigned long currentMillis) {
+    servo.update(currentMillis);
+
     switch (currentState) {
         case BarmanState::WAITING_FOR_TASK:
             if (!queue.isEmpty()) {
@@ -29,7 +31,7 @@ void Barman::update(unsigned long currentMillis) {
                     currentlyServedStationId = stationId;
                     actionStartTime = currentMillis;
 
-                    servo.setAngle(stationsDegreeAngles[currentlyServedStationId]);
+                    servo.moveTo(stationsDegreeAngles[currentlyServedStationId], moveDuration);
                     currentState = BarmanState::MOVING;
                 }
             }
