@@ -25,9 +25,9 @@ namespace GlobalConfig {
     /* NOTE: This parameter impacts the speed of servomotor */
     static constexpr uint32_t MOVE_DURATION_MS = 500; 
 
-    static constexpr uint32_t FILL_DURATION_MS = 2000;
-    static constexpr uint32_t PUMP_START_DELAY = 2000;
-    static constexpr uint32_t PUMP_STOP_DELAY = 3000;
+    static constexpr uint32_t FILL_DURATION_MS = 4000;
+    static constexpr uint32_t PUMP_START_DELAY = 500;
+    static constexpr uint32_t PUMP_STOP_DELAY = 1000;
 
     static constexpr uint16_t LED_BLINK_INTERVAL_MS = 250; 
 
