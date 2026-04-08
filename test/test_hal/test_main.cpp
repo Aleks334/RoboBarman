@@ -5,6 +5,9 @@
 #include "Pump.h"
 #include "Sensor.h"
 #include "ServoMotor.h"
+#include "../test_common.h"
+
+using namespace TestUtils;
 
 const uint8_t TEST_LED_PIN = 13;
 const uint8_t TEST_R_LED_PIN = 1;
@@ -15,6 +18,9 @@ const uint8_t TEST_PUMP_PIN = 8;
 const uint8_t TEST_SENSOR_PIN = 9;
 const uint8_t TEST_SERVO_PIN = 10;
 
+const uint32_t TEST_PUMP_START_DELAY_MS = 100;
+const uint32_t TEST_PUMP_STOP_DELAY_MS = 100;
+
 Led* testLed;
 RgbLed* testRgbLed;
 
@@ -23,10 +29,11 @@ Sensor* testSensor;
 ServoMotor* testServo;
 
 void setUp() {
+    clock = 0;
     testLed = new Led(TEST_LED_PIN);
     testRgbLed = new RgbLed(TEST_R_LED_PIN, TEST_G_LED_PIN, TEST_B_LED_PIN);
 
-    testPump = new Pump(TEST_PUMP_PIN);
+    testPump = new Pump(TEST_PUMP_PIN, TEST_PUMP_START_DELAY_MS, TEST_PUMP_STOP_DELAY_MS);
     testSensor = new Sensor(TEST_SENSOR_PIN);
     testServo = new ServoMotor(TEST_SERVO_PIN);
     
@@ -65,15 +72,34 @@ void test_should_toggle_led_state() {
     TEST_ASSERT_FALSE(testLed->isOn());
 }
 
-void test_should_start_pump() {
-    testPump->start();
-    TEST_ASSERT_TRUE(testPump->isRunning());
+void test_should_have_idle_state_initially() {
+    TEST_ASSERT_FALSE(testPump->isBusy());    
 }
 
-void test_should_stop_pump() {
+void test_should_delay_start_of_pump() {
     testPump->start();
+    testPump->update(clock);
+    TEST_ASSERT_EQUAL(PumpState::START_DELAY, testPump->getState());
+
+    tickFastForward(TEST_PUMP_START_DELAY_MS);
+    testPump->update(clock);
+    TEST_ASSERT_EQUAL(PumpState::RUNNING, testPump->getState());
+}
+
+void test_should_delay_stop_of_pump() {
+    testPump->start();
+    testPump->update(clock);
+    
+    tickFastForward(TEST_PUMP_START_DELAY_MS);
+    testPump->update(clock);
+
     testPump->stop();
-    TEST_ASSERT_FALSE(testPump->isRunning());
+    testPump->update(clock);
+    TEST_ASSERT_EQUAL(PumpState::STOP_DELAY, testPump->getState());
+
+    tickFastForward(TEST_PUMP_STOP_DELAY_MS);
+    testPump->update(clock);
+    TEST_ASSERT_EQUAL(PumpState::IDLE, testPump->getState());
 }
 
 void test_sensor_should_return_simulated_value() {

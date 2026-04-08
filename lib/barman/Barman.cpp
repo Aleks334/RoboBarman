@@ -5,7 +5,6 @@ Barman::Barman(Queue& orderQueue, uint32_t moveDuration, uint32_t fillDuration, 
     : queue(orderQueue), 
       currentState(BarmanState::WAITING_FOR_TASK), 
       currentlyServedStationId(NO_STATION), 
-      actionStartTime(0),
       hasFinishedFilling(false),
       moveDuration(moveDuration),
       fillDuration(fillDuration),
@@ -21,6 +20,7 @@ void Barman::begin() {
 }
 
 void Barman::update(unsigned long currentMillis) {
+    pump.update(currentMillis);
     servo.update(currentMillis);
 
     switch (currentState) {
@@ -30,8 +30,6 @@ void Barman::update(unsigned long currentMillis) {
 
                 if (queue.pop(stationId) == QueueStatus::OK) {
                     currentlyServedStationId = stationId;
-                    actionStartTime = currentMillis;
-
                     servo.moveTo(stationsDegreeAngles[currentlyServedStationId], moveDuration);
                     currentState = BarmanState::MOVING;
                 }
@@ -39,18 +37,15 @@ void Barman::update(unsigned long currentMillis) {
             break;
 
         case BarmanState::MOVING:
-            if ((currentMillis - actionStartTime) >= moveDuration) {
-                actionStartTime = currentMillis;
-
-                pump.start();
+            if (!servo.getIsMoving()) { 
+                pump.pour(fillDuration, currentMillis);
                 currentState = BarmanState::FILLING;
             }
             break;
 
         case BarmanState::FILLING:
-            if ((currentMillis - actionStartTime) >= fillDuration) {
-                pump.stop();
-                hasFinishedFilling = true; 
+            if (!pump.isBusy()) {
+                hasFinishedFilling = true;
                 currentState = BarmanState::WAITING_FOR_TASK;
             }
             break;
@@ -58,7 +53,7 @@ void Barman::update(unsigned long currentMillis) {
 }
 
 void Barman::abort() {
-    pump.stop();
+    pump.stopInstantly();
     servo.setAngleInstantly(idlePosition);
 
     currentState = BarmanState::WAITING_FOR_TASK;

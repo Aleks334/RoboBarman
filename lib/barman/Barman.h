@@ -17,7 +17,6 @@ private:
     
     uint8_t currentlyServedStationId; 
 
-    unsigned long actionStartTime;
     bool hasFinishedFilling;
 
     uint32_t moveDuration;

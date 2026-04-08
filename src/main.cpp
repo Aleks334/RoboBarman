@@ -12,9 +12,9 @@
 
 using namespace GlobalConfig;
 
-Queue ordersQueue(GlobalConfig::QUEUE_CAPACITY);
+Queue ordersQueue(QUEUE_CAPACITY);
 
-Pump barmanPump(PIN_PUMP);
+Pump barmanPump(PIN_PUMP, PUMP_START_DELAY, PUMP_STOP_DELAY);
 ServoMotor barmanServo(PIN_SERVO);
 
 Barman barman(

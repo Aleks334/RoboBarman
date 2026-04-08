@@ -25,9 +25,10 @@ namespace GlobalConfig {
     /* NOTE: This parameter impacts the speed of servomotor */
     static constexpr uint32_t MOVE_DURATION_MS = 500; 
 
-    /* NOTE: This parameter should include extra time to prevent any remaining liquid 
-    from spilling out after the pump is turned off */
-    static constexpr uint32_t FILL_DURATION_MS = 2000 + 500;
+    static constexpr uint32_t FILL_DURATION_MS = 2000;
+    static constexpr uint32_t PUMP_START_DELAY = 2000;
+    static constexpr uint32_t PUMP_STOP_DELAY = 3000;
+
     static constexpr uint16_t LED_BLINK_INTERVAL_MS = 250; 
 
     static constexpr uint8_t SERVO_POS_IDLE = 90;   

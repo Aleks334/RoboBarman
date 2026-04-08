@@ -22,10 +22,13 @@ Pump* pump;
 ServoMotor* servo;
 Barman* barman;
 
+const uint32_t TEST_PUMP_START_DELAY_MS = 100;
+const uint32_t TEST_PUMP_STOP_DELAY_MS = 100;
+
 void setUp() {
     clock = 0;
     queue = new Queue(TEST_QUEUE_CAPACITY);
-    pump = new Pump(TEST_PUMP_PIN);
+    pump = new Pump(TEST_PUMP_PIN, TEST_PUMP_START_DELAY_MS, TEST_PUMP_STOP_DELAY_MS);
     servo = new ServoMotor(TEST_SERVO_PIN);
     
     barman = new Barman(*queue, TEST_MOVE_TIME, TEST_FILLING_TIME, *pump, *servo, testStationsDegreeAngles, TEST_IDLE_POS);
