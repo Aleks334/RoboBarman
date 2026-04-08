@@ -12,13 +12,14 @@ private:
     uint32_t moveStartTime;
     uint32_t duration;
     bool isMoving;
+    uint8_t currentAngle;
 
 public:
     ServoMotor(uint8_t pin);
     void begin();
     void update(unsigned long currentMillis);
 
-    void moveTo(uint8_t angle, uint32_t moveDuration);
+    void moveTo(uint8_t angle, uint32_t moveDuration, uint32_t startTime);
     void setAngleInstantly(uint8_t angle);
 
     bool getIsMoving() const;

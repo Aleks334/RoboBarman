@@ -30,7 +30,7 @@ void Barman::update(unsigned long currentMillis) {
 
                 if (queue.pop(stationId) == QueueStatus::OK) {
                     currentlyServedStationId = stationId;
-                    servo.moveTo(stationsDegreeAngles[currentlyServedStationId], moveDuration);
+                    servo.moveTo(stationsDegreeAngles[currentlyServedStationId], moveDuration, currentMillis);
                     currentState = BarmanState::MOVING;
                 }
             }
