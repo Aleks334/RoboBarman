@@ -54,21 +54,6 @@ void Pump::update(unsigned long currentMillis) {
     }
 }
 
-// void Pump::start() {
-//     if (currentState == PumpState::IDLE) {
-//         actionStartTime = currentTime;
-//         currentState = PumpState::START_DELAY;
-//     }
-// }
-
-// void Pump::stop() {
-//     if (currentState == PumpState::RUNNING || currentState == PumpState::START_DELAY) {
-//         digitalWrite(pin, LOW);
-//         actionStartTime = currentTime;
-//         currentState = PumpState::STOP_DELAY;
-//     }
-// }
-
 PumpState Pump::getState() const {
     return currentState;
 }

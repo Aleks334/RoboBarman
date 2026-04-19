@@ -50,9 +50,11 @@ To adjust the behaviour or change pins please edit `GlobalConfig.h` file [here](
 -	LEDs are SOLID_GREEN
 
 
-### States 
+### States and transitions 
 
-Station states:
+#### Station
+
+States:
 - IDLE – Station is empty.
 - OCCUPIED – Cup detected, waiting in queue.
 - IN_PROGRESS – System has started handling the order.
@@ -65,11 +67,14 @@ stateDiagram-v2
     IDLE --> OCCUPIED
     OCCUPIED --> IDLE
     OCCUPIED --> IN_PROGRESS
+    IN_PROGRESS --> IDLE
     IN_PROGRESS --> READY
     READY --> IDLE
 ```
 
-Barman states:
+#### Barman
+
+States:
 -	WAITING_FOR_TASK
 -	MOVING
 -	FILLING
@@ -79,62 +84,49 @@ Transitions:
 stateDiagram-v2
     [*] --> WAITING_FOR_TASK
     WAITING_FOR_TASK --> MOVING
+    MOVING --> WAITING_FOR_TASK
     MOVING --> FILLING
     FILLING --> WAITING_FOR_TASK
 ```
 
+#### Pump
+
+States:
+- IDLE
+- START_DELAY
+- RUNNING
+- STOP_DELAY
+
+Transitions:
+```mermaid
+stateDiagram-v2
+  [*] --> IDLE
+  IDLE --> START_DELAY
+  START_DELAY --> RUNNING
+  START_DELAY --> IDLE
+  RUNNING --> STOP_DELAY
+  RUNNING --> IDLE
+  STOP_DELAY --> IDLE
+```
+
 ### Happy path
-1. User A places a cup on one of the available stations.
+1. User places a cup on one of the available stations.
 2. The sensor detects the cup; station state changes to OCCUPIED, LED turns SOLID_RED.
 3. The system pulls the task from the queue. Station state changes to IN_PROGRESS, LED FLASHING_RED.
 4. The robot moves the arm to the station's position.
-5. The robot turns the pump ON.
-6. After the specified duration, the pump turns OFF.
-7. Station state changes to READY, LED FLASHING_GREEN.
-8. User A removes the cup, releasing station. Station state returns to IDLE, LED turns SOLID_GREEN.
-
-
-### Main loop pseudocode
-```
-// Sensor handling.
-For each station (i) in the stations array:
-    If sensors[i] DETECTS cup AND stations[i] == IDLE:
-        stations[i] = OCCUPIED
-        led[i] = SOLID_RED
-        Add (i) to the end of the queue
-        
-    If sensors[i] DOES NOT DETECT cup AND (stations[i] == OCCUPIED OR stations[i] == READY):
-        stations[i] = IDLE
-        led[i] = SOLID_GREEN
-
-
-// Queue and dispensing handling.
-If BARMAN_STATE == WAITING_FOR_TASK AND queue_length > 0:
-    currently_served = Pull and remove the first element from the queue
-    If stations[currently_served] == OCCUPIED:
-        stations[currently_served] = IN_PROGRESS
-        led[currently_served] = FLASHING_RED
-        Move arm to position(currently_served)
-        Save current time to: movement_start_time
-        BARMAN_STATE = MOVING
-
-If BARMAN_STATE == MOVING:
-    If (current_time - movement_start_time) >= ARM_MOVEMENT_DURATION:
-        Turn pump ON
-        Save current time to: pump_start_time
-        BARMAN_STATE = FILLING
-
-If BARMAN_STATE == FILLING:
-   If (current_time - pump_start_time) >= FILLING_DURATION:
-        Turn pump OFF
-        stations[currently_served] = READY
-        led[currently_served] = FLASHING_GREEN
-        BARMAN_STATE = WAITING_FOR_TASK
-        currently_served = NULL
-```
+5. The robot initiates the pouring sequence.
+6. Station state changes to READY, LED FLASHING_GREEN.
+7. User removes the cup, releasing station. Station state returns to IDLE, LED turns SOLID_GREEN.
 
 ### Edge cases to manage
-- Cup removed during the filling process.
-- Liquid tank is empty
-- Microcontroller reset during the filling process.
-- Hand placed instead of a cup
+1. Cup removed during the filling process.<br>
+    **[SOLVED]:** barman calls abort() method to instantly return to idle position, turn off the pump and cancel order.
+
+2. Liquid tank is empty.<br>
+    **[IN PROGRESS]**
+
+3. Microcontroller reset during the filling process.<br>
+    **[IN PROGRESS]**
+
+4. Hand placed instead of a cup.<br>
+     **[SOLVED]:** sensors are located from bottom of the case and only placing cup inside the station hole will trigger the process.
