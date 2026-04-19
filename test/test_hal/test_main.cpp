@@ -13,8 +13,9 @@ const uint8_t TEST_R_LED_PIN = 1;
 const uint8_t TEST_G_LED_PIN = 2;
 const uint8_t TEST_B_LED_PIN = 3;
 const uint8_t TEST_PUMP_PIN = 8;
-const uint8_t TEST_SENSOR_PIN = 9;
-const uint8_t TEST_SERVO_PIN = 10;
+const uint8_t TEST_SENSOR_TRIG_PIN = 9;
+const uint8_t TEST_SENSOR_ECHO_PIN = 10;
+const uint8_t TEST_SERVO_PIN = 11;
 
 const uint32_t TEST_PUMP_START_DELAY_MS = 100;
 const uint32_t TEST_PUMP_STOP_DELAY_MS = 100;
@@ -30,7 +31,7 @@ void setUp() {
     testLed = new Led(TEST_LED_PIN);
     testRgbLed = new RgbLed(TEST_R_LED_PIN, TEST_G_LED_PIN, TEST_B_LED_PIN);
     testPump = new Pump(TEST_PUMP_PIN, TEST_PUMP_START_DELAY_MS, TEST_PUMP_STOP_DELAY_MS);
-    testSensor = new Sensor(TEST_SENSOR_PIN);
+    testSensor = new Sensor(TEST_SENSOR_TRIG_PIN, TEST_SENSOR_ECHO_PIN);
     testServo = new ServoMotor(TEST_SERVO_PIN);
     
     testLed->begin();

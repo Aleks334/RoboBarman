@@ -40,7 +40,7 @@ void setup() {
     for (uint8_t stationId = 0; stationId < NUM_STATIONS; stationId++) {
         StationPins config = STATIONS_CONFIG[stationId];
 
-        Sensor* sensor = new Sensor(config.sensor, SENSOR_DEBOUNCE_MS);
+        Sensor* sensor = new Sensor(config.sensorTrigPin, config.sensorEchoPin, SENSOR_DEBOUNCE_MS);
         RgbLed* led = new RgbLed(config.red, config.green, config.blue, LED_COMMON_ANODE);
         
         stations[stationId] = new Station(
