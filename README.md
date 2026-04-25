@@ -13,26 +13,51 @@ This project is for the computer systems architecture course. Its objective is t
 git clone https://github.com/Aleks334/RoboBarman.git
 ```
 
-2. Compile project:
+2. Make sure that your board is detected by PlatformIO by running: `pio device list`.
+
+3. Choose your enviroment
+This project supports two hardware configurations defined in [platformio.ini](/platformio.ini). You must specify the environment using the -e flag.
+
+<br>
+
+|Environment   |Hardware target   |Bootloader  | 
+|---|---|---|
+| `uno`  | Arduino Uno board  | Optiboot (115200 baud)  |
+| `atmega328`  | standalone chip on custom PCB |Duemilanove (57600 baud)  |
+
+<br>
+
+4. Compile & upload
+
+For Arduino Uno:
 ```bash
 pio run -e uno
+
+pio run -e uno -t upload
 ```
 
-3. Upload project to the board:
+For standalone ATmega328P (used on our custom PCB):
+
 ```bash
-pio run -t upload
+pio run -e atmega328
+
+pio run -e atmega328 -t upload
 ```
 
-More about [PlatformIO CLI](https://docs.platformio.org/en/latest/core/index.html)
-
-> [!NOTE]
-> Please make sure that your board is detected by PlatformIO by running: `pio device list`.
+More about [PlatformIO CLI](https://docs.platformio.org/en/latest/core/index.html) and [moving from Arduino to a microcontroller on a breadboard](https://docs.arduino.cc/built-in-examples/arduino-isp/ArduinoToBreadboard/)
 
 ## Testing
 
-To run unit tests located in `test/` directory use this command:
+To run unit tests located in the `test/` directory, specify your environment:
+
+Testing on Uno:
 ```bash
 pio test -e uno
+```
+
+Testing on standalone chip:
+```bash
+pio test -e atmega328
 ```
 
 ## Configuration
