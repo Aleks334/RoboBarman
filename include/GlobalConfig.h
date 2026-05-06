@@ -6,7 +6,7 @@ namespace GlobalConfig {
     static constexpr uint8_t QUEUE_CAPACITY = 5;
     static constexpr uint8_t NUM_STATIONS = 1;
 
-    static constexpr uint8_t PIN_PUMP = 7;
+    static constexpr uint8_t PIN_PUMP = 13;
     static constexpr uint8_t PIN_SERVO = 6;
 
     struct StationPins {
@@ -16,9 +16,9 @@ namespace GlobalConfig {
         uint8_t green;
         uint8_t blue;
     };
-
+ 
     static constexpr StationPins STATIONS_CONFIG[NUM_STATIONS] = {
-        {9, 8, A0, A2, A4}
+        {8, 9, A0, A1, A2}
     };
 
     static constexpr bool LED_COMMON_ANODE = true; 
@@ -35,5 +35,6 @@ namespace GlobalConfig {
     static constexpr uint8_t SERVO_POS_IDLE = 90;   
     static constexpr uint8_t SERVO_STATIONS_DEGREE_ANGLES[NUM_STATIONS] = {155};
 
-    static constexpr uint16_t SENSOR_DEBOUNCE_MS = 50;   
+    static constexpr uint16_t SENSOR_DEBOUNCE_MS = 50;  
+    static constexpr uint16_t SENSOR_DETECTION_TRESHOLD_CM = 8; 
 }
