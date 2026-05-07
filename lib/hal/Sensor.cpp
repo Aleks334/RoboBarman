@@ -67,9 +67,9 @@ bool Sensor::readSensorValue() {
 
 double Sensor::calculateDistance(unsigned long echoDurationUs) const {
     // The speed of sound in air at 20 C is about 343 m/s = 0.0343 cm/us
-    const double speedOfSoundCmPerUs = 0.0343;
+    const double SPEED_OF_SOUND_CM_PER_US = 0.0343;
 
-    double totalDistance = echoDurationUs * speedOfSoundCmPerUs;
+    double totalDistance = echoDurationUs * SPEED_OF_SOUND_CM_PER_US;
     double distanceToObject = totalDistance / 2.0;
 
     return distanceToObject;
