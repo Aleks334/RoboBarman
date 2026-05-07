@@ -1,0 +1,60 @@
+#include "RoboBarmanController.h"
+
+Queue ordersQueue(QUEUE_CAPACITY);
+
+Pump barmanPump(PIN_PUMP, PUMP_START_DELAY, PUMP_STOP_DELAY);
+ServoMotor barmanServo(PIN_SERVO);
+
+Barman barman(
+    ordersQueue, 
+    MOVE_DURATION_MS, 
+    FILL_DURATION_MS, 
+    barmanPump, 
+    barmanServo, 
+    SERVO_STATIONS_DEGREE_ANGLES, 
+    SERVO_POS_IDLE
+);
+
+Station* stations[NUM_STATIONS];
+
+void RoboBarmanController::init() {
+    Serial.begin(9600);
+    Serial.println(F("=== AUTOMATIC BARMAN SYSTEM STARTING... ==="));
+
+    barman.begin();
+    Serial.println(F("[System]: Pump and servomotor initialized."));
+
+    for (uint8_t stationId = 0; stationId < NUM_STATIONS; stationId++) {
+        StationPins config = STATIONS_CONFIG[stationId];
+
+        Sensor* sensor = new Sensor(config.sensorTrigPin, config.sensorEchoPin, SENSOR_DEBOUNCE_MS, SENSOR_DETECTION_TRESHOLD_CM);
+        RgbLed* led = new RgbLed(config.red, config.green, config.blue, LED_COMMON_ANODE);
+        
+        stations[stationId] = new Station(
+            stationId, 
+            *sensor, 
+            *led, 
+            ordersQueue, 
+            barman, 
+            LED_BLINK_INTERVAL_MS
+        );
+        
+        stations[stationId]->begin();
+
+        Serial.print("[System]: Station ID "); 
+        Serial.print(stationId); 
+        Serial.println(" initialized.");
+    }
+
+    Serial.println(F("=== SYSTEM READY TO SERVE ==="));
+}
+
+void RoboBarmanController::update() {
+    unsigned long currentMillis = millis();
+
+    barman.update(currentMillis);
+
+    for (uint8_t i = 0; i < NUM_STATIONS; i++) {
+        stations[i]->update(currentMillis);
+    }
+}
