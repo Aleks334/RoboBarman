@@ -20,6 +20,8 @@ class RoboBarmanController {
         Station* stations[NUM_STATIONS];
     
     public:
+    RoboBarmanController();
+    ~RoboBarmanController();
      void init();
      void update();
 };

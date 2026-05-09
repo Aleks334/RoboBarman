@@ -1,21 +1,24 @@
 #include "RoboBarmanController.h"
 
-Queue ordersQueue(QUEUE_CAPACITY);
+RoboBarmanController::RoboBarmanController() : 
+    ordersQueue(QUEUE_CAPACITY),
+    barmanPump(PIN_PUMP, PUMP_START_DELAY, PUMP_STOP_DELAY),
+    barmanServo(PIN_SERVO),
+    barman(ordersQueue, MOVE_DURATION_MS, FILL_DURATION_MS, barmanPump, barmanServo, SERVO_STATIONS_DEGREE_ANGLES, SERVO_POS_IDLE)
+{
+    for (uint8_t i = 0; i < NUM_STATIONS; i++) {
+        stations[i] = nullptr;
+    }
+}
 
-Pump barmanPump(PIN_PUMP, PUMP_START_DELAY, PUMP_STOP_DELAY);
-ServoMotor barmanServo(PIN_SERVO);
-
-Barman barman(
-    ordersQueue, 
-    MOVE_DURATION_MS, 
-    FILL_DURATION_MS, 
-    barmanPump, 
-    barmanServo, 
-    SERVO_STATIONS_DEGREE_ANGLES, 
-    SERVO_POS_IDLE
-);
-
-Station* stations[NUM_STATIONS];
+RoboBarmanController::~RoboBarmanController() {
+    for (uint8_t i = 0; i < NUM_STATIONS; i++) {
+        if(stations[i] != nullptr) {
+            delete stations[i];
+            stations[i] = nullptr;
+        }
+    }
+}
 
 void RoboBarmanController::init() {
     Serial.begin(9600);
@@ -32,8 +35,8 @@ void RoboBarmanController::init() {
         
         stations[stationId] = new Station(
             stationId, 
-            *sensor, 
-            *led, 
+            sensor, 
+            led, 
             ordersQueue, 
             barman, 
             LED_BLINK_INTERVAL_MS
