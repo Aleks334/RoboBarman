@@ -16,6 +16,7 @@ void Sensor::begin() {
 }
 
 void Sensor::update(unsigned long currentMillis) {
+    
     if (isSimulationMode) return;
 
     if (currentMillis - lastPingTime < MIN_PING_INTERVAL_MS) {
@@ -61,6 +62,8 @@ bool Sensor::readSensorValue() {
     }
 
     double distance = calculateDistance(echoDurationUs);
+ //   Serial.print("Distance [cm]: ");
+ //   Serial.println(distance);
 
     return (distance >= 0.0 && distance <= detectionThresholdCm);
 }

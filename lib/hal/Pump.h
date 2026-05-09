@@ -24,8 +24,6 @@ public:
     void pour(uint32_t duration, uint32_t startTime);
     void update(unsigned long currentMillis);
 
-    // void start();
-    // void stop();
     void stopInstantly();
     
     PumpState getState() const;
