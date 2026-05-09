@@ -1,26 +1,44 @@
 #include "HardwareTester.h"
 
-using namespace GlobalConfig;
+HardwareTester::HardwareTester(
+    uint8_t numStations, 
+    const StationPins* stationConfigs, 
+    uint8_t pinPump, 
+    uint32_t pumpStartDelay, 
+    uint32_t pumpStopDelay, 
+    uint8_t pinServo, 
+    bool ledCommonAnode, 
+    uint16_t sensorDebounceMs, 
+    uint16_t sensorThresholdCm,
+    uint32_t moveDurationMs,
+    uint32_t fillDurationMs
+) : numStations(numStations), 
+    pumpStartDelay(pumpStartDelay), 
+    pumpStopDelay(pumpStopDelay),
+    moveDurationMs(moveDurationMs), 
+    fillDurationMs(fillDurationMs) 
+{
+    pump = new Pump(pinPump, pumpStartDelay, pumpStopDelay);
+    servo = new ServoMotor(pinServo);
 
-HardwareTester::HardwareTester() {
-    pump = new Pump(PIN_PUMP, PUMP_START_DELAY, PUMP_STOP_DELAY);
-    servo = new ServoMotor(PIN_SERVO);
+    stationSensors = new Sensor*[numStations];
+    stationLeds = new RgbLed*[numStations];
 
-    for (uint8_t i = 0; i < NUM_STATIONS; i++) {
-        StationPins config = STATIONS_CONFIG[i];
+    for (uint8_t i = 0; i < numStations; i++) {
+        StationPins config = stationConfigs[i];
         
         stationSensors[i] = new Sensor(
             config.sensorTrigPin, 
             config.sensorEchoPin, 
-            SENSOR_DEBOUNCE_MS, 
-            SENSOR_DETECTION_TRESHOLD_CM
+            sensorDebounceMs, 
+            sensorThresholdCm
         );
 
         stationLeds[i] = new RgbLed(
             config.red, 
             config.green, 
             config.blue, 
-            LED_COMMON_ANODE
+            ledCommonAnode
         );
     }
 }
@@ -29,10 +47,13 @@ HardwareTester::~HardwareTester() {
     delete pump;
     delete servo;
 
-    for (uint8_t i = 0; i < GlobalConfig::NUM_STATIONS; i++) {
+    for (uint8_t i = 0; i < numStations; i++) {
         delete stationSensors[i];
         delete stationLeds[i];
     }
+    
+    delete[] stationSensors;
+    delete[] stationLeds;
 }
 
 void HardwareTester::begin() {
@@ -42,12 +63,12 @@ void HardwareTester::begin() {
     pump->begin();
     servo->begin();
 
-    for (uint8_t i = 0; i < GlobalConfig::NUM_STATIONS; i++) {
+    for (uint8_t i = 0; i < numStations; i++) {
         stationSensors[i]->begin();
         stationLeds[i]->begin();
     }
     
-    Serial.println("=== INITIALIZATION SUCCEDED ===");
+    Serial.println("=== INITIALIZATION SUCCEEDED ===");
 }
 
 void HardwareTester::tick(unsigned long durationMs) {
@@ -57,32 +78,32 @@ void HardwareTester::tick(unsigned long durationMs) {
         
         pump->update(currentMillis);
         servo->update(currentMillis);
-        for (uint8_t i = 0; i < NUM_STATIONS; i++) {
+        for (uint8_t i = 0; i < numStations; i++) {
             stationSensors[i]->update(currentMillis);
         }
     }
 }
 
-void HardwareTester::runFullDiagnostics() {
+void HardwareTester::runDiagnostics() {
     Serial.println("\n=== FULL COMPONENT DIAGNOSTICS STARTED ===");
 
     Serial.println("[TEST] Servomotor");
     servo->setAngleInstantly(60);
-    tick(MOVE_DURATION_MS);
+    tick(moveDurationMs);
     servo->setAngleInstantly(120);
-    tick(MOVE_DURATION_MS);
+    tick(moveDurationMs);
 
     Serial.println("[TEST] Pump");
     unsigned long testStartTime = millis();
-    pump->pour(FILL_DURATION_MS, testStartTime);
-    tick(FILL_DURATION_MS + PUMP_START_DELAY + PUMP_STOP_DELAY + 500);
+    pump->pour(fillDurationMs, testStartTime);
+    tick(fillDurationMs + pumpStartDelay + pumpStopDelay + 500);
 
-    for (uint8_t i = 0; i < GlobalConfig::NUM_STATIONS; i++) {
+    for (uint8_t i = 0; i < numStations; i++) {
         Serial.print("\n=== TESTING STATION NO. ");
         Serial.print(i + 1);
         Serial.println(" ===");
 
-        Serial.println("[TEST] rgb led");
+        Serial.println("[TEST] RGB LED");
         stationLeds[i]->setColor(Color::RED);
         delay(800);
         stationLeds[i]->setColor(Color::GREEN);
@@ -94,10 +115,10 @@ void HardwareTester::runFullDiagnostics() {
         Serial.println("[TEST] Ultrasonic sensor");
         Serial.println("Place the cup in 10 seconds or less...");
         
-        unsigned long testStartTime = millis();
+        unsigned long sensorTestStartTime = millis();
         bool objectDetected = false;
 
-        while (millis() - testStartTime < 10000) {
+        while (millis() - sensorTestStartTime < 10000) {
             tick(50);
             
             if (stationSensors[i]->hasDetectedObject()) {
