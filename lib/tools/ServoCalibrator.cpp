@@ -1,23 +1,30 @@
 #include "ServoCalibrator.h"
 
-using namespace GlobalConfig;
+ServoCalibrator::ServoCalibrator(
+    uint8_t servoPin, 
+    uint8_t trigPin,
+    uint8_t echoPin, 
+    uint8_t rPin,
+    uint8_t gPin,
+    uint8_t bPin,
+    uint16_t sensorDebounceMs, 
+    uint16_t sensorThresholdCm, 
+    bool ledCommonAnode
+) {
+    servo = new ServoMotor(servoPin);
 
-ServoCalibrator::ServoCalibrator() {
-    servo = new ServoMotor(PIN_SERVO);
-
-    StationPins config = STATIONS_CONFIG[0];
     sensor = new Sensor(
-        config.sensorTrigPin, 
-        config.sensorEchoPin, 
-        SENSOR_DEBOUNCE_MS, 
-        SENSOR_DETECTION_TRESHOLD_CM
+        trigPin, 
+        echoPin, 
+        sensorDebounceMs, 
+        sensorThresholdCm
     );
 
     led = new RgbLed(
-        config.red, 
-        config.green, 
-        config.blue, 
-        LED_COMMON_ANODE
+        rPin, 
+        gPin, 
+        bPin, 
+        ledCommonAnode
     );
 }
 
@@ -27,23 +34,34 @@ ServoCalibrator::~ServoCalibrator() {
     delete led;
 }
 
+void ServoCalibrator::begin() {
+    Serial.begin(9600);
+    Serial.println("\n=== SERVO CALIBRATION ===");
+
+    servo->begin();
+    sensor->begin();
+    led->begin();
+    
+    servo->setAngleInstantly(currentAngle);
+}
+
 void ServoCalibrator::update() {
     unsigned long currentMillis = millis();
+
     sensor->update(currentMillis);
     servo->update(currentMillis);
 
     if (locked) return;
     
     if (sensor->hasDetectedObject()) {
-        led->setColor(Color::WHITE);
-        delay(2000); 
         locked = true;
+        led->setColor(Color::WHITE);
         blinkResult(currentAngle);
     } else {
-        unsigned long lastStep = 0;
-
-        if (currentMillis - lastStep > 100) {
+        if (currentMillis - lastStep >= 100) {
             currentAngle++;
+            if (currentAngle > 160) currentAngle = 20;
+            
             servo->setAngleInstantly(currentAngle);
             lastStep = currentMillis;
         }
@@ -57,11 +75,16 @@ void ServoCalibrator::blinkResult(int angle) {
 
     auto flash = [&](Color color, int count) {
         for (int i = 0; i < count; i++) {
-            led->setColor(color); delay(300);
-            led->off(); delay(300);
+            led->setColor(color);
+            delay(300);
+            led->off();
+            delay(300);
         }
         delay(1000);
     };
+
+    Serial.print("Calibration completed. Angle: ");
+    Serial.println(angle);
 
     while (true) {
         flash(Color::RED, hundreds);
