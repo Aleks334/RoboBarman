@@ -5,7 +5,7 @@ class Sensor {
 private:
     static constexpr uint16_t MIN_PING_INTERVAL_MS = 60;   
     static constexpr uint16_t TRIGGER_PULSE_US = 10;
-    static constexpr unsigned long PING_TIMEOUT_US = 3000;
+    static constexpr unsigned long PING_TIMEOUT_US = 20000;
     
     uint8_t trigPin;
     uint8_t echoPin;

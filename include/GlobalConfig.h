@@ -1,5 +1,7 @@
 #pragma once
+
 #include <Arduino.h>
+#include "StationPins.h"
 
 namespace GlobalConfig {
 
@@ -8,14 +10,6 @@ namespace GlobalConfig {
 
     static constexpr uint8_t PIN_PUMP = 3;
     static constexpr uint8_t PIN_SERVO = 10;
-
-    struct StationPins {
-        uint8_t sensorTrigPin;
-        uint8_t sensorEchoPin;
-        uint8_t red;
-        uint8_t green;
-        uint8_t blue;
-    };
  
     static constexpr StationPins STATIONS_CONFIG[NUM_STATIONS] = {
         { 6, 5, 11, 13, A0 },
@@ -35,7 +29,7 @@ namespace GlobalConfig {
     static constexpr uint16_t LED_BLINK_INTERVAL_MS = 350; 
 
     static constexpr uint8_t SERVO_POS_IDLE = 90;   
-    static constexpr uint8_t SERVO_STATIONS_DEGREE_ANGLES[NUM_STATIONS] = {60, 120, 150};
+    static constexpr uint8_t SERVO_STATIONS_DEGREE_ANGLES[NUM_STATIONS] = {60, 100, 130};
 
     static constexpr uint16_t SENSOR_DEBOUNCE_MS = 50;  
     static constexpr uint16_t SENSOR_DETECTION_TRESHOLD_CM = 8; 
