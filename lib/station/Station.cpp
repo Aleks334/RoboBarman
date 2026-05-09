@@ -1,17 +1,22 @@
 #include "Station.h"
 
-Station::Station(uint8_t id, Sensor& s, RgbLed& l, Queue& q, Barman& b, uint16_t blinkInterval)
+Station::Station(uint8_t id, Sensor* s, RgbLed* l, Queue& q, Barman& b, uint16_t blinkInterval)
     : id(id), sensor(s), led(l), queue(q), barman(b),
       state(StationState::IDLE), lastBlinkTime(0), blinkInterval(blinkInterval), ledToggleState(false) {}
 
+Station::~Station() {
+    delete sensor;
+    delete led;
+}
+
 void Station::begin() {
-    sensor.begin();
-    led.begin();
+    sensor->begin();
+    led->begin();
 }
 
 void Station::update(unsigned long currentMillis) {
-    sensor.update(currentMillis);
-    bool cupDetected = sensor.hasDetectedObject();
+    sensor->update(currentMillis);
+    bool cupDetected = sensor->hasDetectedObject();
 
     switch (state) {
         case StationState::IDLE:
@@ -60,16 +65,16 @@ void Station::updateLed(unsigned long currentMillis) {
 
     switch (state) {
         case StationState::IDLE:
-            led.setColor(Color::GREEN);
+            led->setColor(Color::GREEN);
             break;
         case StationState::OCCUPIED:
-            led.setColor(Color::RED);
+            led->setColor(Color::RED);
             break;
         case StationState::IN_PROGRESS:
-            led.setColor(ledToggleState ? Color::RED : Color::OFF);
+            led->setColor(ledToggleState ? Color::RED : Color::OFF);
             break;
         case StationState::READY:
-            led.setColor(ledToggleState ? Color::GREEN : Color::OFF);
+            led->setColor(ledToggleState ? Color::GREEN : Color::OFF);
             break;
     }
 }

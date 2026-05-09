@@ -14,8 +14,8 @@ enum class StationState : uint8_t {
 class Station {
 private:
     uint8_t id;
-    Sensor& sensor;
-    RgbLed& led;
+    Sensor* sensor;
+    RgbLed* led;
     Queue& queue;
     Barman& barman;
     
@@ -28,7 +28,8 @@ private:
     void updateLed(unsigned long currentMillis);
 
 public:
-    Station(uint8_t id, Sensor& s, RgbLed& l, Queue& q, Barman& b, uint16_t blinkInterval);
+    Station(uint8_t id, Sensor* s, RgbLed* l, Queue& q, Barman& b, uint16_t blinkInterval);
+    ~Station();
     
     void begin();
     void update(unsigned long currentMillis);
