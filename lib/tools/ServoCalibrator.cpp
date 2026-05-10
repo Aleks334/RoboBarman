@@ -55,12 +55,11 @@ void ServoCalibrator::update() {
     
     if (sensor->hasDetectedObject()) {
         locked = true;
-        led->setColor(Color::WHITE);
         blinkResult(currentAngle);
     } else {
         if (currentMillis - lastStep >= 100) {
             currentAngle++;
-            if (currentAngle > 160) currentAngle = 20;
+            if (currentAngle > MAX_ANGLE) currentAngle = MIN_ANGLE;
             
             servo->setAngleInstantly(currentAngle);
             lastStep = currentMillis;

@@ -11,7 +11,9 @@ private:
     Sensor* sensor;
     RgbLed* led;
 
-    int currentAngle = 20;
+    const uint8_t MIN_ANGLE = 30;
+    const uint8_t MAX_ANGLE = 150;
+    int currentAngle = MIN_ANGLE;
     bool locked = false;
     unsigned long lastStep = 0;
 
