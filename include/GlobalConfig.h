@@ -22,15 +22,15 @@ namespace GlobalConfig {
     /* NOTE: This parameter impacts the speed of servomotor */
     static constexpr uint32_t MOVE_DURATION_MS = 1500; 
 
-    static constexpr uint32_t FILL_DURATION_MS = 4000;
+    static constexpr uint32_t FILL_DURATION_MS = 2000;
     static constexpr uint32_t PUMP_START_DELAY = 500;
     static constexpr uint32_t PUMP_STOP_DELAY = 500;
 
     static constexpr uint16_t LED_BLINK_INTERVAL_MS = 350; 
 
-    static constexpr uint8_t SERVO_POS_IDLE = 90;   
-    static constexpr uint8_t SERVO_STATIONS_DEGREE_ANGLES[NUM_STATIONS] = {60, 100, 130};
+    static constexpr uint8_t SERVO_POS_IDLE = 108;   
+    static constexpr uint8_t SERVO_STATIONS_DEGREE_ANGLES[NUM_STATIONS] = {148, 108, 65};
 
-    static constexpr uint16_t SENSOR_DEBOUNCE_MS = 50;  
-    static constexpr uint16_t SENSOR_DETECTION_TRESHOLD_CM = 8; 
+    static constexpr uint16_t SENSOR_DEBOUNCE_MS = 500;  
+    static constexpr uint16_t SENSOR_DETECTION_TRESHOLD_CM = 11; 
 }

@@ -62,8 +62,8 @@ bool Sensor::readSensorValue() {
     }
 
     double distance = calculateDistance(echoDurationUs);
- //   Serial.print("Distance [cm]: ");
- //   Serial.println(distance);
+    Serial.print("Distance [cm]: ");
+    Serial.println(distance);
 
     return (distance >= 0.0 && distance <= detectionThresholdCm);
 }
