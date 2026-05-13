@@ -4,7 +4,7 @@ RoboBarmanController::RoboBarmanController() :
     ordersQueue(QUEUE_CAPACITY),
     barmanPump(PIN_PUMP, PUMP_START_DELAY, PUMP_STOP_DELAY),
     barmanServo(PIN_SERVO),
-    barman(ordersQueue, MOVE_DURATION_MS, FILL_DURATION_MS, barmanPump, barmanServo, SERVO_STATIONS_DEGREE_ANGLES, SERVO_POS_IDLE)
+    barman(ordersQueue, SERVO_SPEED_MS_PER_DEGREE, FILL_DURATION_MS, barmanPump, barmanServo, SERVO_STATIONS_DEGREE_ANGLES, SERVO_POS_IDLE)
 {
     for (uint8_t i = 0; i < NUM_STATIONS; i++) {
         stations[i] = nullptr;

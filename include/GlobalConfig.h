@@ -19,8 +19,7 @@ namespace GlobalConfig {
 
     static constexpr bool LED_COMMON_ANODE = true; 
 
-    /* NOTE: This parameter impacts the speed of servomotor */
-    static constexpr uint32_t MOVE_DURATION_MS = 1500; 
+    static constexpr uint32_t SERVO_SPEED_MS_PER_DEGREE = 15;
 
     static constexpr uint32_t FILL_DURATION_MS = 2000;
     static constexpr uint32_t PUMP_START_DELAY = 500;
@@ -31,6 +30,6 @@ namespace GlobalConfig {
     static constexpr uint8_t SERVO_POS_IDLE = 108;   
     static constexpr uint8_t SERVO_STATIONS_DEGREE_ANGLES[NUM_STATIONS] = {148, 108, 65};
 
-    static constexpr uint16_t SENSOR_DEBOUNCE_MS = 500;  
+    static constexpr uint16_t SENSOR_DEBOUNCE_MS = 50;  
     static constexpr uint16_t SENSOR_DETECTION_TRESHOLD_CM = 11; 
 }
