@@ -1,12 +1,12 @@
 #include "Barman.h"
 #include <Arduino.h>
 
-Barman::Barman(Queue& orderQueue, uint32_t moveDuration, uint32_t fillDuration, Pump& pump, ServoMotor& servo, const uint8_t* stationsDegreeAngles, uint8_t idlePosition) 
+Barman::Barman(Queue& orderQueue, uint32_t servoSpeed, uint32_t fillDuration, Pump& pump, ServoMotor& servo, const uint8_t* stationsDegreeAngles, uint8_t idlePosition) 
     : queue(orderQueue), 
       currentState(BarmanState::WAITING_FOR_TASK), 
       currentlyServedStationId(NO_STATION), 
       hasFinishedFilling(false),
-      moveDuration(moveDuration),
+      servoSpeed(servoSpeed),
       fillDuration(fillDuration),
       pump(pump),
       servo(servo),
@@ -30,7 +30,7 @@ void Barman::update(unsigned long currentMillis) {
 
                 if (queue.pop(stationId) == QueueStatus::OK) {
                     currentlyServedStationId = stationId;
-                    servo.moveTo(stationsDegreeAngles[currentlyServedStationId], moveDuration, currentMillis);
+                    servo.moveTo(stationsDegreeAngles[currentlyServedStationId], servoSpeed, currentMillis);
                     currentState = BarmanState::MOVING;
                 }
             }

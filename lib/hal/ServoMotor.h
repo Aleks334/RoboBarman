@@ -19,7 +19,7 @@ public:
     void begin();
     void update(unsigned long currentMillis);
 
-    void moveTo(uint8_t angle, uint32_t moveDuration, uint32_t startTime);
+    void moveTo(uint8_t angle, uint32_t speedMsPerDegree, uint32_t startTime);
     void setAngleInstantly(uint8_t angle);
 
     bool getIsMoving() const;

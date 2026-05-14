@@ -39,16 +39,24 @@ void ServoMotor::setAngleInstantly(uint8_t angle) {
     servo.write(angle);
 }
 
-void ServoMotor::moveTo(uint8_t angle, uint32_t moveDuration, uint32_t startTime) {
+void ServoMotor::moveTo(uint8_t angle, uint32_t speedMsPerDegree, uint32_t startTime) {
     if (angle > 180) {
         angle = 180; 
     }
 
     startAngle = currentAngle;
     targetAngle = angle;
-    duration = moveDuration;
+
+    int16_t angleDifference = abs((int16_t)targetAngle - (int16_t)startAngle);
+    duration = (uint32_t)angleDifference * speedMsPerDegree;
     moveStartTime = startTime;
-    isMoving = true;
+
+    if (duration == 0) {
+        isMoving = false;
+        servo.write(targetAngle);
+    } else {
+        isMoving = true;
+    }
 }
 
 uint8_t ServoMotor::getAngle() {
